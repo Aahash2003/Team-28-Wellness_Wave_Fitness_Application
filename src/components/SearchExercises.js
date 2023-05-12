@@ -1,8 +1,58 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { Box, Button, Stack, TextField, Typography} from '@mui/material'
 
 const SearchExercises = () => {
+  const[search, setSearch] = useState('')
+
+    const handleSearch = async () => {
+    if (search) {
+      // const exercisesData = await fetchData();
+    }
+  }
   return (
-    <div>SearchExercises</div>
+    <Stack alignItems="center" 
+    mt="37px" justifyContent="center" 
+    p="20px">
+      <Typography fontWeight={700} 
+      sx={{fontSize: { lg:'44px', xs:'30px' }}}
+      mb="10px" textAlign="center" >
+        Great Exercises You<br/>Should Learn
+      </Typography>
+      <Box position="relative" mb="72px">
+        <TextField
+        sx = {{
+          input: {
+          fontWeight: '700', 
+          border: 'none', 
+          borderRadius: '4px'},
+          width:{ lg: '1000px', xs: '350px'},
+          backgroundColor: '#fff', borderRadius:'40px',
+          
+        }}//the screen is not moving all the text with it when the screen gets smaller
+        height="76px"
+        value= {search}
+        onChange={(e) => setSearch(e.target.value.toLowerCase())}
+        placeholder= "Search Exercises"
+        type="text"/>
+        <Button className="search-btn"
+        sx={{
+          bgcolor:'#FF2625', 
+          color: '#fff', 
+          textTransform: 'none', 
+          width: { lg: '175px', xs: '80px'},
+          fontSize: { lg: '25px', xs: '18px'},
+          height: '56px',
+          position : "absolute",
+          right: '0'
+        }}
+        onClick={handleSearch}
+        >
+          Search
+
+        </Button>
+      </Box>
+    </Stack>
+    
   )
 }
 
