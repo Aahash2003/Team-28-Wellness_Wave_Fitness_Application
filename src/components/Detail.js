@@ -5,7 +5,7 @@ import BodyPartImage from '../Assets/Icon/body-part.png';
 import TargetImage from '../Assets/Icon/target.png';
 import EquipmentImage from '../Assets/Icon/equipment.png';
 const Detail = ({exerciseDetail}) => {
-    const {bodyPart, gifUrl, name, target, eqiupment } = exerciseDetail;
+    const {bodyPart, gifUrl, name, target, equipment } = exerciseDetail;
 
 
     const extraDetail = [
@@ -22,7 +22,7 @@ const Detail = ({exerciseDetail}) => {
 
         {
             icon: EquipmentImage,
-            name: eqiupment,
+            name: equipment,
         },
     ]
   return (
