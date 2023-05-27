@@ -2,7 +2,7 @@ export const exerciseOptions = {
     method: 'GET',
     headers: {
         'X-RapidAPI-Host': 'exercisedb.p.rapidapi.com',
-        'X-RapidAPI-Key': '8a728a8cd5msh78882717985ecb6p1a2723jsnb943d0ac0fc8'
+        'X-RapidAPI-Key': '95f37c8d05msh4b578eea2ad66dfp12a957jsn31f3793ca6cc'
         // fix it within the env class
 
     }
