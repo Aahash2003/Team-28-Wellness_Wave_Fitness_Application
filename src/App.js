@@ -1,6 +1,5 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom';
-
+import React, { useState, useEffect } from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 
 import './App.css';
@@ -9,18 +8,35 @@ import ExerciseDetail from './pages/ExerciseDetail';
 import Home from './pages/Home';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-const App = () => {
-  return (
-    <Box width = "400px" sx={{ width: { x1: '1488px' }}} m="auto">
-       < Navbar /> 
-        <Routes>
-            <Route path="/"element={<Home />}/>
-            <Route path="/exercise/:id" element={<ExerciseDetail />}/>
-            <Route path="/" element={<CaloricCounter />}/>
-        </Routes>
-        <Footer />
-        </Box>
-  )
-}
+import Signup from './components/Signup';
+import Login from './components/Login';
+import EmailVerify from './components/EmailVerify';
 
-export default App
+const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  return (
+    <Box width="400px" sx={{ width: { xl: '1488px' }}} m="auto">
+      <Navbar isAuthenticated={isAuthenticated} /> 
+      <Routes>
+        <Route path="/" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
+        <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
+        <Route path="/exercise/:id" element={isAuthenticated ? <ExerciseDetail /> : <Navigate replace to="/login" />} />
+        <Route path="/caloric-counter" element={isAuthenticated ? <CaloricCounter /> : <Navigate replace to="/login" />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
+        <Route path="/users/:id/verify/:token" element={<EmailVerify />} />
+      </Routes>
+      <Footer />
+    </Box>
+  );
+};
+
+export default App;

@@ -28,7 +28,7 @@ const HeroBanner = () => {
 
 
                     </Typography>
-                    <img src= {HeroBannerImage} alt= "banner" className='hero-banner-img' style={{ left: '500px', margin:'20px'}}px = "-20px"/>
+                    <img src= {HeroBannerImage} alt= "banner" className='hero-banner-img' style={{ left: '100000px', margin:'20px'}}px = "-20px"/>
         </Box>
     )
 }
