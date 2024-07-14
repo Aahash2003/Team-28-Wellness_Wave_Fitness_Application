@@ -9,7 +9,7 @@ const Footer = () => {
       alignItems="center" px="0px" pt="24px">
         <img src={Logo} alt="logo" width="800px" height="160px"/>
         <Typography variant="h5" pb="40px" mt="0px">
-          By Aahash Srikumar :)
+          By Aahash Srikumar : Under Construction!
         </Typography>
       </Stack>
     </Box>
