@@ -13,10 +13,11 @@ const userSchema = new mongoose.Schema({
 	firstName: { type: String, required: true },
 	lastName: { type: String, required: true },
     nickName: {type: String, required: true},
-	email: { type: String, required: true },
+	email: { type: String, required: true, unique: true },
 	password: { type: String, required: true },
 	verified: { type: Boolean, default: false },
-	disabled: { type: Boolean, default: false }
+	disabled: { type: Boolean, default: false },
+	workouts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Workout' }]
 });
 
 userSchema.methods.generateAuthToken = function () {
