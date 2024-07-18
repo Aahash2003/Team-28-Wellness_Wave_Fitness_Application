@@ -3,7 +3,7 @@ require('../Server/models/user')
 // const { User } = require('../server/models/user'); // Uncomment if using User model
 const JWTPRIVATEKEY= "nUnhO+b/IJ2viBa/dbaFlBMmwkcUht99s/Hn681YqVY="
 const express = require('express');
-require('../server/db')
+require('../Server/db')
 
 
 // Include other models or utilities as needed
