@@ -25,7 +25,7 @@ export const fetchData = async (url, options) => {
 
 export const fetchAllExercises = async () => {
   let exercises = [];
-  let limit = 10; // Adjust the limit as needed
+  let limit = 20; // Adjust the limit as needed
   let offset = 0;
   let hasMore = true;
 

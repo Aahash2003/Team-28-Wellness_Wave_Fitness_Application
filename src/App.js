@@ -11,6 +11,7 @@ import Footer from './components/Footer';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import EmailVerify from './components/EmailVerify';
+import WorkoutLog from './components/WorkoutPage/workout'
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
         <Route path="/exercise/:id" element={isAuthenticated ? <ExerciseDetail /> : <Navigate replace to="/login" />} />
         <Route path="/caloric-counter" element={isAuthenticated ? <CaloricCounter /> : <Navigate replace to="/login" />} />
+        <Route path="/workout" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
         <Route path="/users/:id/verify/:token" element={<EmailVerify />} />
