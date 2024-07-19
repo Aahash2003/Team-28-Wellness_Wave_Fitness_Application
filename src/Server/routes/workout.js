@@ -1,6 +1,6 @@
-const express = require("express");
-const { User } = require("../models/user");
-const Workout = require("../models/workoutlist");
+const express = require('express');
+const { User } = require('../models/user');
+const Workout = require('../models/workoutlist');
 
 const router = express.Router();
 
@@ -40,18 +40,15 @@ router.get('/user/:email/workouts', async (req, res) => {
     const { email } = req.params;
 
     try {
-        // Find the user by email instead of ID
-        const user = await User.findOne({ email: email }).populate('workouts');
+        const user = await User.findOne({ email }).populate('workouts');
         if (!user) {
             return res.status(404).send('User not found');
         }
 
-        // Send back the user's workouts
         res.status(200).json(user.workouts);
     } catch (error) {
         res.status(400).send(error.message);
     }
 });
-
 
 module.exports = router;
