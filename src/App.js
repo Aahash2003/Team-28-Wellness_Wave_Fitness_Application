@@ -12,6 +12,7 @@ import Signup from './components/Signup';
 import Login from './components/Login';
 import EmailVerify from './components/EmailVerify';
 import WorkoutLog from './components/WorkoutPage/workout'
+import WorkoutLogger from './components/WorkoutPage/workout';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -35,6 +36,7 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
         <Route path="/users/:id/verify/:token" element={<EmailVerify />} />
+        <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <Navigate replace to="/home" /> : <WorkoutLogger />} />
       </Routes>
       <Footer />
     </Box>

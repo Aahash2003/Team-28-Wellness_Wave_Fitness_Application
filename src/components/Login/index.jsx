@@ -7,31 +7,26 @@ const Login = () => {
     const [data, setData] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
     const [resend, setResend] = useState(false);
-    const navigate = useNavigate(); // Using useHistory hook for redirection
+    const navigate = useNavigate();
 
     const handleChange = ({ currentTarget: input }) => {
         setData({ ...data, [input.name]: input.value });
     };
 
     const handleSubmit = async (e) => {
-		e.preventDefault();
-		try {
-			const url = "http://localhost:8080/api/auth";
-			const { data: res } = await axios.post(url, data);
-			localStorage.setItem("token", res.data);
-			localStorage.setItem("isVerified", res.verified); // Store the verification status
-            //localStorage.setItem("isAdmin", res.isAdmin);
+        e.preventDefault();
+        try {
+            const url = "http://localhost:8080/api/auth";
+            const { data: res } = await axios.post(url, data);
+            localStorage.setItem("token", res.data);
+            localStorage.setItem("isVerified", res.verified); // Store the verification status
+            localStorage.setItem('email', data.email); // Store the email
 
-            //fetchUserData();
-			if (res.verified === false) {
-				setError("Please verify your email to access all features.");
-				setResend(true);
-            } /*else if (res.isAdmin) {
-        window.location="/";
-        navigate("/");
-
-            } */ else {
-				window.location="/";
+            if (res.verified === false) {
+                setError("Please verify your email to access all features.");
+                setResend(true);
+            } else {
+                window.location = "/";
                 navigate("/"); // Redirect to main page if verified
             }
         } catch (error) {
@@ -41,31 +36,14 @@ const Login = () => {
             }
         }
     };
-    /*const fetchUserData = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            };
-    
-            const response = await axios.get("http://localhost:4000/admin/users", config);
-            console.log(response.data); // Process the response data as needed
-        } catch (error) {
-            console.error("Error fetching user data:", error);
-            // Handle errors (e.g., token expired, unauthorized access)
-        }
-    };
-    
-*/
+
     const handleResendVerification = async () => {
         try {
             const { email } = data;
             await axios.post('http://localhost:8080/api/auth/resend-verification', { email });
             setError("Verification email resent. Please check your inbox.");
-			window.location="/";
-			navigate("/"); // Redirect to main page after resending the email
+            window.location = "/";
+            navigate("/"); // Redirect to main page after resending the email
         } catch (error) {
             setError("Error resending verification email.");
         }
@@ -98,7 +76,7 @@ const Login = () => {
                         {error && <div className={styles.error_msg}>{error}</div>}
                         {resend && (
                             <div className={styles.resend_container}>
-                                <button onClick={handleResendVerification} className={styles.resend_btn}>
+                                <button type="button" onClick={handleResendVerification} className={styles.resend_btn}>
                                     Resend Verification Email
                                 </button>
                             </div>
