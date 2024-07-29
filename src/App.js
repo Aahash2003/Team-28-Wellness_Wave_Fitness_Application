@@ -11,33 +11,35 @@ import Footer from './components/Footer';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import EmailVerify from './components/EmailVerify';
-import WorkoutLog from './components/WorkoutPage/workout'
+import WorkoutLog from './components/WorkoutPage/workout';
 import WorkoutLogger from './components/WorkoutPage/workout';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (token) {
       setIsAuthenticated(true);
     }
   }, []);
 
   return (
-    <Box width="400px" sx={{ width: { xl: '1488px' }}} m="auto">
-      <Navbar isAuthenticated={isAuthenticated} /> 
-      <Routes>
-        <Route path="/" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
-        <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
-        <Route path="/exercise/:id" element={isAuthenticated ? <ExerciseDetail /> : <Navigate replace to="/login" />} />
-        <Route path="/caloric-counter" element={isAuthenticated ? <CaloricCounter /> : <Navigate replace to="/login" />} />
-        <Route path="/workout" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
-        <Route path="/users/:id/verify/:token" element={<EmailVerify />} />
-        <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <Navigate replace to="/home" /> : <WorkoutLogger />} />
-      </Routes>
+    <Box className="app-container">
+      <Navbar isAuthenticated={isAuthenticated} />
+      <Box className="content-container">
+        <Routes>
+          <Route path="/" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
+          <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
+          <Route path="/exercise/:id" element={isAuthenticated ? <ExerciseDetail /> : <Navigate replace to="/login" />} />
+          <Route path="/caloric-counter" element={isAuthenticated ? <CaloricCounter /> : <Navigate replace to="/login" />} />
+          <Route path="/workout" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
+          <Route path="/users/:id/verify/:token" element={<EmailVerify />} />
+          <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <Navigate replace to="/home" /> : <WorkoutLogger />} />
+        </Routes>
+      </Box>
       <Footer />
     </Box>
   );
