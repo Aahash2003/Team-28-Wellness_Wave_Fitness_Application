@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 import './Workout.css'; // Import the CSS file for styling
 
 const WorkoutLogger = () => {
@@ -13,6 +15,7 @@ const WorkoutLogger = () => {
   const [currentRepMax, setCurrentRepMax] = useState('');
   const [oneRepMax, setOneRepMax] = useState('');
   const [workouts, setWorkouts] = useState([]);
+  const [date, setDate] = useState(new Date());
 
   useEffect(() => {
     console.log('Email from local storage:', email); // Debug log
@@ -41,7 +44,8 @@ const WorkoutLogger = () => {
         restTime,
         currentRepMax,
         oneRepMax,
-        email // Include email in the workout logging request
+        email, // Include email in the workout logging request
+        date
       });
       alert('Workout logged successfully');
       fetchWorkouts();
@@ -65,9 +69,20 @@ const WorkoutLogger = () => {
     }
   }, [email]);
 
+  const onDateChange = date => {
+    setDate(date);
+  };
+
+  const filteredWorkouts = workouts.filter(workout => {
+    const workoutDate = new Date(workout.date).toDateString();
+    const selectedDate = date.toDateString();
+    return workoutDate === selectedDate;
+  });
+
   return (
-    <div>
-      <h2>Log a New Workout</h2>
+    <div className="container">
+      <h2>Log a New Workout for {date.toDateString()}</h2>
+      <Calendar onChange={onDateChange} value={date} />
       <input
         type="text"
         placeholder="Workout Name"
@@ -104,22 +119,8 @@ const WorkoutLogger = () => {
         value={currentRepMax}
         onChange={(e) => setCurrentRepMax(e.target.value)}
       />
-    
-      <button onClick={handleLogWorkout}>Log Workout</button>
       
-
-      <h2>Your Workouts</h2>
-      {workouts.length > 0 ? (
-        <ul className="workout-list">
-          {workouts.map((workout) => (
-            <li key={workout._id}>
-              {workout.workoutName} - Sets: {workout.sets}, Reps: {workout.reps}, Weight: {workout.weight} LBS, Rest Time: {workout.restTime}s, Current One Rep Max: {workout.currentRepMax} LBS
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No workouts logged yet.</p>
-      )}
+      <button onClick={handleLogWorkout}>Log Workout</button>
       <div className="one-rep-max-container">
         <input
           type="text"
@@ -129,8 +130,20 @@ const WorkoutLogger = () => {
         />
         <span className="one-rep-max-label">LBS</span>
       </div>
+      <h2>Your Workouts for {date.toDateString()}</h2>
+      {filteredWorkouts.length > 0 ? (
+        <ul className="workout-list">
+          {filteredWorkouts.map((workout) => (
+            <li key={workout._id}>
+              {workout.workoutName} - Sets: {workout.sets}, Reps: {workout.reps}, Weight: {workout.weight} LBS, Rest Time: {workout.restTime}s, Current One Rep Max: {workout.currentRepMax} LBS
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No workouts logged for this date.</p>
+      )}
+      
     </div>
-    
   );
 };
 
