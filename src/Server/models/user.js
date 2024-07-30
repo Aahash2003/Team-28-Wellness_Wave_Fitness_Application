@@ -17,7 +17,8 @@ const userSchema = new mongoose.Schema({
 	password: { type: String, required: true },
 	verified: { type: Boolean, default: false },
 	disabled: { type: Boolean, default: false },
-	workouts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Workout' }]
+	workouts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Workout' }],
+	calories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Calories' }]
 });
 
 userSchema.methods.generateAuthToken = function () {
