@@ -1,8 +1,9 @@
 // src/components/LogCalories.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import fetchCalories from './ViewCalories'
 
-const LogCalories = () => {
+const LogCalories = ({onLogSuccess }) => {
   const email = localStorage.getItem('email');
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
@@ -24,6 +25,7 @@ const LogCalories = () => {
         fats,
       });
       alert(response.data);
+      onLogSuccess(); 
     } catch (error) {
       console.error(error);
       alert('Error logging calories');

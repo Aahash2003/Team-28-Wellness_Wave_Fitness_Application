@@ -1,6 +1,6 @@
 const express = require('express');
 const { User } = require('../models/user');
-const Workout = require('../models/calorielog');
+const CalorieData = require('../models/calorielog');
 const dotenv = require('dotenv');
 const axios = require('axios');
 const path = require('path');
@@ -9,7 +9,7 @@ const router = express.Router();
 const envPath = path.resolve(__dirname,'../utils/.env');
 console.log("dotenv")
 dotenv.config({ path: envPath });
-// Log a new workout
+// Log a new CalorieData
 router.post('/logcalories', async (req, res) => {
     const { email, calories, protein, carbohydrates, fats } = req.body;
 
@@ -19,7 +19,7 @@ router.post('/logcalories', async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        const newlog = new Workout({
+        const newlog = new CalorieData({
             calories,
             protein,
             carbohydrates,
@@ -38,7 +38,7 @@ router.post('/logcalories', async (req, res) => {
 });
 
 console.log("USDA Key" + process.env.USDA_API_KEY)
-// Get workouts for a specific user
+// Get CalorieDatas for a specific user
 router.get('/user/:email/calories', async (req, res) => {
     const { email } = req.params;
 
@@ -52,6 +52,35 @@ router.get('/user/:email/calories', async (req, res) => {
     } catch (error) {
         res.status(400).send(error.message);
     }
+});
+router.delete('/logcalories/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+      const log = await CalorieData.findById(id);
+      if (!log) {
+          return res.status(404).send('Calorie log not found');
+      }
+
+      // Find the associated user
+      const user = await User.findById(log.user);
+      if (!user) {
+          return res.status(404).send('User not found');
+      }
+
+      // Remove the log ID from the user's calories array
+      user.calories = user.calories.filter(logId => logId.toString() !== id);
+
+      // Save the user after removing the reference
+      await user.save();
+
+      // Delete the calorie log
+      await CalorieData.deleteOne({ _id: id });
+
+      res.status(200).send('Calorie log deleted successfully');
+  } catch (error) {
+      res.status(400).send(error.message);
+  }
 });
 
 router.get('/macros', async (req, res) => {
