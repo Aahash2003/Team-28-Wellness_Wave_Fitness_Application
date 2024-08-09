@@ -12,10 +12,7 @@ import Login from './components/Login';
 import EmailVerify from './components/EmailVerify';
 import WorkoutLog from './components/WorkoutPage/workout';
 import WorkoutLogger from './components/WorkoutPage/workout';
-
-import ViewCalories from './components/CalorieLog/ViewCalories';
-import FoodSearch from './components/CalorieLog/FoodSearch';
-import LogCalories from './components/CalorieLog/LogCalories';
+import CaloriePage from './components/CalorieLog/CaloriePage';
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -34,9 +31,7 @@ const App = () => {
           <Route path="/" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
           <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
           <Route path="/exercise/:id" element={isAuthenticated ? <ExerciseDetail /> : <Navigate replace to="/login" />} />
-          <Route path="/LogCalories" element={isAuthenticated ? <LogCalories /> : <Navigate replace to="/login" />} />
-          <Route path="/ViewCalories" element={isAuthenticated ? <ViewCalories /> : <Navigate replace to="/login" />} />
-          <Route path="/FoodSearch" element={isAuthenticated ? <FoodSearch /> : <Navigate replace to="/login" />} />
+          <Route path="/Calories" element={isAuthenticated ? <CaloriePage /> : <Navigate replace to="/login" />} />
           <Route path="/workout" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
