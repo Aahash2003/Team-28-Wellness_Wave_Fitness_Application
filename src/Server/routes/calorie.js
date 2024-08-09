@@ -37,8 +37,6 @@ router.post('/logcalories', async (req, res) => {
     }
 });
 
-console.log("USDA Key" + process.env.USDA_API_KEY)
-// Get CalorieDatas for a specific user
 router.get('/user/:email/calories', async (req, res) => {
     const { email } = req.params;
 
@@ -150,4 +148,33 @@ router.get('/macros', async (req, res) => {
       res.status(500).json({ error: 'An error occurred while fetching macro information' });
     }
   });
+  // Log a searched food item directly to the user's calorie log
+router.post('/macros/log', async (req, res) => {
+  const { email, item, calories, protein, carbohydrates, fats } = req.body;
+
+  try {
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).send('User not found');
+      }
+
+      const newlog = new CalorieData({
+          item, // Name of the food item
+          calories,
+          protein,
+          carbohydrates,
+          fats,
+          user: user._id
+      });
+
+      await newlog.save();
+      user.calories.push(newlog._id);
+      await user.save();
+
+      res.status(201).send('Food item logged successfully');
+  } catch (error) {
+      res.status(400).send(error.message);
+  }
+});
+
 module.exports = router;

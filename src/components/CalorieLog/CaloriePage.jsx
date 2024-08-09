@@ -37,6 +37,10 @@ class CaloriePage extends Component {
     this.fetchCalories();
   };
 
+  handleFoodSuccess = () => {
+    this.fetchCalories();
+  }
+
   render() {
     const { calories } = this.state;
 
@@ -44,7 +48,7 @@ class CaloriePage extends Component {
       <Box className="calories-page-container">
         <h1>Calories Management</h1>
         <Box className="calories-page-section">
-          <FoodSearch />
+          <FoodSearch onFoodSuccess={this.handleFoodSuccess}/>
         </Box>
         <Box className="calories-page-section">
           <LogCalories onLogSuccess={this.handleLogSuccess} />
