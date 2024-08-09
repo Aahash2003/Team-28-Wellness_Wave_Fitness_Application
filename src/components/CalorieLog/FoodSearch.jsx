@@ -1,10 +1,10 @@
-// src/components/FoodSearch.js
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const FoodSearch = () => {
+const FoodSearch = ({onFoodSuccess}) => {
   const [query, setQuery] = useState('');
   const [macros, setMacros] = useState(null);
+  const email = localStorage.getItem('email');
 
   const handleSearch = async (event) => {
     event.preventDefault();
@@ -14,6 +14,26 @@ const FoodSearch = () => {
     } catch (error) {
       console.error(error);
       alert('Error fetching macro information');
+    }
+  };
+
+  const handleLogFood = async () => {
+    if (macros) {
+      try {
+        const response = await axios.post('http://localhost:8080/api/calories/macros/log', {
+          email,
+          item: macros.item,
+          calories: macros.calories,
+          protein: macros.proteins,
+          carbohydrates: macros.carbohydrates,
+          fats: macros.fats
+        });
+        alert('Food item logged successfully');
+        onFoodSuccess();
+      } catch (error) {
+        console.error(error);
+        alert('Error logging food item');
+      }
     }
   };
 
@@ -37,6 +57,7 @@ const FoodSearch = () => {
           <p>Fats: {macros.fats} g</p>
           <p>Proteins: {macros.proteins} g</p>
           <p>Calories: {macros.calories} kcal</p>
+          <button onClick={handleLogFood}>Log Food to Calorie Log</button>
         </div>
       )}
     </div>
