@@ -1,39 +1,18 @@
-// src/components/CalorieLog/ViewCalories.jsx
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import './ViewCalories.css';
-import { features } from 'process';
 
-const ViewCalories = ({onDeleteSuccess }) => {
+const ViewCalories = ({ calories, onDeleteSuccess }) => {
   const email = localStorage.getItem('email');
-  const [calories, setCalories] = useState([]); // Storing the data from the Get Function
-
-  const fetchCalories = async () => {
-    try {
-      const response = await axios.get(`http://localhost:8080/api/calories/user/${email}/calories`);
-      setCalories(response.data);
-    } catch (error) {
-      console.error('Error fetching calorie data:', error);
-      alert('Error fetching calorie data');
-    }
-  };
-
-  // useEffect to fetch calorie logs when the component mounts
-  useEffect(() => {
-    if (email) {
-      fetchCalories();
-    }
-  }, [email]);
-
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:8080/api/calories/logcalories/${id}`);
       alert('Calorie log deleted');
-      fetchCalories(); // Refresh logs after deletion
-      onDeleteSuccess();
+      onDeleteSuccess(); // Trigger the parent to refresh the logs
     } catch (error) {
-      console.error(error);
+      console.error('Error deleting calorie log:', error);
       alert('Error deleting calorie log');
     }
   };
@@ -42,7 +21,7 @@ const ViewCalories = ({onDeleteSuccess }) => {
     <div className="container">
       <h2>View Calories</h2>
       <ul>
-        {calories.map((log) => (// Maps the Data to the UI but from the specific data log information
+        {calories.map((log) => (
           <li key={log._id}>
             <span className="log-item">{log.calories} kcal</span>
             <span className="log-item">{log.protein} g protein</span>
@@ -54,6 +33,12 @@ const ViewCalories = ({onDeleteSuccess }) => {
       </ul>
     </div>
   );
+};
 
-}
+// Define PropTypes for the component to ensure correct prop usage
+ViewCalories.propTypes = {
+  calories: PropTypes.array.isRequired,
+  onDeleteSuccess: PropTypes.func.isRequired,
+};
+
 export default ViewCalories;
