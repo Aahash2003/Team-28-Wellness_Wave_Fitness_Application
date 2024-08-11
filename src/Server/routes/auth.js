@@ -5,8 +5,12 @@ const crypto = require("crypto");
 const sendEmail = require("../utils/SendEmail");
 const bcrypt = require("bcrypt");
 const Joi = require("joi");
+const dotenv = require('dotenv');
+const path = require('path');
 
-
+const envPath = path.resolve(__dirname,'../utils/.env');
+console.log("dotenv")
+dotenv.config({ path: envPath });
 router.post("/", async (req, res) => {
 	try {
 		const { error } = validate(req.body);
