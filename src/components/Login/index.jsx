@@ -42,8 +42,7 @@ const Login = () => {
             const { email } = data;
             await axios.post('http://localhost:8080/api/auth/resend-verification', { email });
             setError("Verification email resent. Please check your inbox.");
-            window.location = "/";
-            navigate("/"); // Redirect to main page after resending the email
+           setResend(false);
         } catch (error) {
             setError("Error resending verification email.");
         }
