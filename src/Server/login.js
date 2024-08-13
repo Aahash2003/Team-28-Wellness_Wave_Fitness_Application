@@ -7,6 +7,8 @@ const userRoutes = require("./routes/user");
 const authRoutes = require("./routes/auth");
 const workoutRoutes = require("./routes/workout")
 const caloriesRoutes = require("./routes/calorie")
+const calcRoutes = require("./routes/caloriecalc")
+const profileRoutes = require("./routes/profile")
 
 
 // database connection
@@ -21,6 +23,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/workout", workoutRoutes)
 app.use("/api/calories", caloriesRoutes)
+app.use("/api/calc", calcRoutes)
+app.use("/api/profile", profileRoutes)
 
 const port = process.env.PORT || 8080;
 app.listen(port, console.log(`Listening on port ${port}...`));

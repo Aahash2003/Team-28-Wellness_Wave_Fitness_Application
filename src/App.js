@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
+import { ChakraProvider } from '@chakra-ui/react';
+
+
 
 import './App.css';
 import ExerciseDetail from './pages/ExerciseDetail';
@@ -13,6 +16,7 @@ import EmailVerify from './components/EmailVerify';
 import WorkoutLog from './components/WorkoutPage/workout';
 import WorkoutLogger from './components/WorkoutPage/workout';
 import CaloriePage from './components/CalorieLog/CaloriePage';
+import Profile from './components/profile/Profile';
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -37,6 +41,18 @@ const App = () => {
           <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
           <Route path="/users/:id/verify/:token" element={<EmailVerify />} />
           <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <Navigate replace to="/home" /> : <WorkoutLogger />} />
+          <Route
+            path="/profile"
+            element={
+              isAuthenticated ? (
+                <ChakraProvider>
+                  <Profile />
+                </ChakraProvider>
+              ) : (
+                <Navigate replace to="/login" />
+              )
+            }
+          />
         </Routes>
       </Box>
       <Footer />
