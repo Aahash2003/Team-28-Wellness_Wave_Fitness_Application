@@ -5,18 +5,21 @@ const router = express.Router();
 // Route to create or update user profile
 router.post('/', async (req, res) => {
     try {
-        const { email, age, gender, height, currentWeight, activityLevel } = req.body;
+        let { email, dob, gender, height, currentWeight, activityLevel } = req.body;
 
-        if (!email || !age || !gender || !height || !currentWeight || !activityLevel) {
+        if (!email || !dob || !gender || !height || !currentWeight || !activityLevel) {
             return res.status(400).json({ msg: 'Please provide all required fields.' });
         }
+
+        // Format the DOB to remove the time part
+        const formattedDOB = new Date(dob).toISOString().split('T')[0];
 
         // Find if profile exists by email, otherwise create a new one
         let profile = await Profile.findOne({ email });
 
         if (profile) {
             // Update existing profile
-            profile.Age = age;
+            profile.DOB = formattedDOB;
             profile.Gender = gender;
             profile.Height = height;
             profile.CurrentWeight = currentWeight;
@@ -26,7 +29,7 @@ router.post('/', async (req, res) => {
             // Create new profile
             profile = new Profile({
                 email,
-                Age: age,
+                DOB: formattedDOB,
                 Gender: gender,
                 Height: height,
                 CurrentWeight: currentWeight,
