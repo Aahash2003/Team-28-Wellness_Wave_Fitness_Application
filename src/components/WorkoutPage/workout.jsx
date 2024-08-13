@@ -81,7 +81,7 @@ const WorkoutLogger = () => {
 
   return (
     <div className="container">
-      <h2>Log a New Workout for {date.toDateString()}</h2>
+      <h2>{date.toDateString()}</h2>
       <Calendar onChange={onDateChange} value={date} />
       <input
         type="text"

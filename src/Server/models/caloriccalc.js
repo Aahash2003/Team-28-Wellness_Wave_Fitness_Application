@@ -2,20 +2,25 @@ const mongoose = require('mongoose');
 
 // Define the Calc schema
 const calcSchema = new mongoose.Schema({
-    Age: {type: Number, required: true},
-    Height: {type: Number, required: true},
-    CurrentWeight: {type: Number, required: true},
-    TargetWeight: {type: Number, required: true},
-    StartDate: {type: Date, default: Date.now, required: true},
+    Age: { type: Number, required: true },
+    Gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
+    Height: { type: Number, required: true }, // in cm
+    CurrentWeight: { type: Number, required: true }, // in kg
+    TargetWeight: { type: Number, required: true }, // in kg
+    ActivityLevel: { type: String, enum: ['Sedentary', 'Lightly Active', 'Moderately Active', 'Very Active', 'Super Active'], required: true },
+    StartDate: { type: Date, default: Date.now, required: true },
     EndDate: { type: Date, required: true },
-    
-
-
+    MacronutrientRatio: {
+        Fat: { type: Number, required: true },
+        Protein: { type: Number, required: true },
+        Carbohydrates: { type: Number, required: true },
+    },
 });
 
-const Calc = mongoose.model('Calorie Calculator', calcSchema);
+const Calc = mongoose.model('CalorieCalculator', calcSchema);
 
 module.exports = Calc;
+
 
 
 //(Current Weight, Height, Age, Start Date, End Date)/ Store the Information, Target Weight
