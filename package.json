@@ -13,6 +13,7 @@
     "assert": "^2.1.0",
     "axios": "^1.7.2",
     "browserify-zlib": "^0.2.0",
+    "dayjs": "^1.11.12",
     "deps": "^1.0.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",

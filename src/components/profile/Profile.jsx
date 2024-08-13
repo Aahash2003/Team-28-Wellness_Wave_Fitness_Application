@@ -13,10 +13,11 @@ import {
     Alert,
     AlertIcon,
 } from '@chakra-ui/react';
+import dayjs from 'dayjs';
 
 const Profile = () => {
     const [formData, setFormData] = useState({
-        age: '',
+        dob: '',  // Changed from age to dob
         gender: 'Male',
         height: '',
         currentWeight: '',
@@ -26,16 +27,23 @@ const Profile = () => {
     const [profile, setProfile] = useState(null);
     const [error, setError] = useState('');
 
-    const { age, gender, height, currentWeight, activityLevel } = formData;
+    const { dob, gender, height, currentWeight, activityLevel } = formData;
 
     const handleChange = (e) => {
-        setFormData({  email, ...formData, [e.target.name]: e.target.value });
+        setFormData({ email, ...formData, [e.target.name]: e.target.value });
+    };
+
+    const calculateAge = (dob) => {
+        return dayjs().diff(dob, 'year');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:8080/api/profile/', formData);
+            // Format the dob to remove the time part
+            const formattedDOB = dayjs(dob).format('YYYY-MM-DD');
+
+            const res = await axios.post('http://localhost:8080/api/profile/', { ...formData, dob: formattedDOB, email });
             setProfile(res.data.profile);
             setError('');
         } catch (err) {
@@ -69,18 +77,17 @@ const Profile = () => {
                     <FormControl id="email" isRequired>
                         <FormLabel>Email</FormLabel>
                         <Input
-                            
                             name="email"
                             value={email}
                             isReadOnly
                         />
                     </FormControl>
-                    <FormControl id="age" isRequired>
-                        <FormLabel>Age</FormLabel>
+                    <FormControl id="dob" isRequired>
+                        <FormLabel>Date of Birth</FormLabel>
                         <Input
-                            type="number"
-                            name="age"
-                            value={age}
+                            type="date"
+                            name="dob"
+                            value={dob}
                             onChange={handleChange}
                         />
                     </FormControl>
@@ -136,7 +143,8 @@ const Profile = () => {
             {profile && (
                 <Box mt={6} p={4} borderWidth="1px" borderRadius="lg">
                     <Text><strong>Email:</strong> {profile.email}</Text>
-                    <Text><strong>Age:</strong> {profile.Age}</Text>
+                    <Text><strong>Date of Birth:</strong> {profile.DOB.split('T')[0]}</Text>
+                    <Text><strong>Age:</strong> {calculateAge(profile.DOB)}</Text>
                     <Text><strong>Gender:</strong> {profile.Gender}</Text>
                     <Text><strong>Height:</strong> {profile.Height} cm</Text>
                     <Text><strong>Current Weight:</strong> {profile.CurrentWeight} kg</Text>
