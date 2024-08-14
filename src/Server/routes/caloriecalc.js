@@ -138,24 +138,39 @@ router.post('/store-caloric-value', async (req, res) => {
     try {
         const { email, caloricMaintenance, dailyCalories } = req.body;
 
-        if (!email || (!caloricMaintenance && !dailyCalories)) {
+        if (!email || (caloricMaintenance === undefined && dailyCalories === undefined)) {
             return res.status(400).json({ msg: 'Please provide email and at least one caloric value.' });
         }
 
-        const caloricValue = new CaloricValue({
-            email,
-            caloricMaintenance: caloricMaintenance ? parseFloat(caloricMaintenance) : null,
-            dailyCalories: dailyCalories ? parseFloat(dailyCalories) : null,
-        });
+        // Determine which fields to update and set the other field to null
+        let update = {};
+        if (caloricMaintenance !== undefined) {
+            update = {
+                caloricMaintenance: parseFloat(caloricMaintenance),
+                dailyCalories: null, // Set the other field to null
+            };
+        } else if (dailyCalories !== undefined) {
+            update = {
+                caloricMaintenance: null, // Set the other field to null
+                dailyCalories: parseFloat(dailyCalories),
+            };
+        }
 
-        await caloricValue.save();
+        // Use findOneAndUpdate to update the existing entry or create it if it doesn't exist
+        const caloricValue = await CaloricValue.findOneAndUpdate(
+            { email }, // Filter by email
+            update,    // Update with the specified values
+            { new: true, upsert: true, setDefaultsOnInsert: true } // Return the updated document, create it if it doesn't exist
+        );
+
         console.log({ msg: 'Caloric value stored successfully', caloricValue });
         res.json({ msg: 'Caloric value stored successfully', caloricValue });
     } catch (err) {
-        console.error(err);
+        console.error('Error storing caloric value:', err.message);
         res.status(500).send('Server Error');
     }
 });
+
 
 
 // Route to calculate macronutrient grams based on stored caloric value
