@@ -29,7 +29,8 @@ const CalorieCalc = () => {
     const fetchCaloricMaintenance = async () => {
       try {
         const res = await axios.get(`http://localhost:8080/api/calc/calculate/${email}`);
-        setCalorieMaintenance(parseFloat(res.data.calorie_Maintenance).toFixed(2));
+        const maintenanceValue = parseFloat(res.data.calorie_Maintenance).toFixed(2);
+        setCalorieMaintenance(maintenanceValue);
       } catch (err) {
         setError('Error fetching caloric maintenance. Please try again later.');
         setCalorieMaintenance(null);
@@ -49,11 +50,19 @@ const CalorieCalc = () => {
       const res = await axios.get(`http://localhost:8080/api/calc/calculate-DC/${email}`, {
         params: formData
       });
-      setDailyCalories(parseFloat(res.data.dailyCalories).toFixed(2));
+      const dailyCaloriesValue = parseFloat(res.data.dailyCalories).toFixed(2);
+      setDailyCalories(dailyCaloriesValue);
       setError('');
     } catch (err) {
       setError('Error calculating daily calories. Please check your input and try again.');
       setDailyCalories(null);
+    }
+  };
+
+  const handleStoreValue = (value) => {
+    if (value) {
+      localStorage.setItem('dailyCalories', value);
+      alert('Daily Caloric Intake stored successfully!');
     }
   };
 
@@ -105,11 +114,17 @@ const CalorieCalc = () => {
       {calorieMaintenance !== null && (
         <Box mt={6} p={4} borderWidth="1px" borderRadius="lg">
           <Text><strong>Caloric Maintenance:</strong> {calorieMaintenance} calories/day</Text>
+          <Button colorScheme="blue" onClick={() => handleStoreValue(calorieMaintenance)}>
+            Set As Daily Caloric Intake
+          </Button>
         </Box>
       )}
       {dailyCalories !== null && (
         <Box mt={6} p={4} borderWidth="1px" borderRadius="lg">
           <Text><strong>Daily Caloric Intake to Reach Goal:</strong> {dailyCalories} calories/day</Text>
+          <Button colorScheme="blue" onClick={() => handleStoreValue(dailyCalories)}>
+            Set As Daily Caloric Intake
+          </Button>
         </Box>
       )}
     </Box>
