@@ -215,6 +215,37 @@ router.get('/calculate-macros/:email', async (req, res) => {
     }
 });
 
+// POST route to store macronutrient values
+router.post('/store-macros/:email', async (req, res) => {
+    try {
+        const { email } = req.params;
+        const { fatGrams, proteinGrams, carbGrams } = req.body;
+
+        if (!email || fatGrams === undefined || proteinGrams === undefined || carbGrams === undefined) {
+            return res.status(400).json({ msg: 'Please provide email and all macronutrient values.' });
+        }
+
+        // Find the existing caloric value entry by email
+        const caloricValue = await CaloricValue.findOne({ email });
+        if (!caloricValue) {
+            return res.status(404).json({ msg: 'Caloric value not found. Please calculate and store the values first.' });
+        }
+
+        // Update the caloricValue with the new macronutrient values
+        caloricValue.fatGrams = fatGrams;
+        caloricValue.proteinGrams = proteinGrams;
+        caloricValue.carbGrams = carbGrams;
+
+        // Save the updated caloricValue
+        await caloricValue.save();
+
+        res.json({ msg: 'Macronutrient values stored successfully', caloricValue });
+    } catch (err) {
+        console.error('Error storing macronutrient values:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 
 
 module.exports = router;

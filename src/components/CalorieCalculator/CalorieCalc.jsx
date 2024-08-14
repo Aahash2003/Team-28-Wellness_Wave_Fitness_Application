@@ -124,9 +124,15 @@ const CalorieCalc = () => {
     }
   };
 
-  const handleStoreMacros = () => {
-    localStorage.setItem("MacroGrams", JSON.stringify(macroGrams)); // Store the calculated macros in local storage
-    alert('Macros stored successfully!');
+  const handleStoreMacros = async () => {
+    try {
+      // Make a post request to store macros in the backend
+      await axios.post(`http://localhost:8080/api/calc/store-macros/${email}`, macroGrams);
+      localStorage.setItem("MacroGrams", JSON.stringify(macroGrams)); // Store the calculated macros in local storage
+      alert('Macros stored successfully!');
+    } catch (err) {
+      setError('Error storing macronutrient values. Please try again later.');
+    }
   };
 
   return (
