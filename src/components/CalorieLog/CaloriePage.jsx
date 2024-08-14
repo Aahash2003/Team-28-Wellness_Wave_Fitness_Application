@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Box, Heading, VStack } from '@chakra-ui/react';
+import { Box, Heading, VStack, Text } from '@chakra-ui/react';
 import LogCalories from './LogCalories';
 import ViewCalories from './ViewCalories';
 import FoodSearch from './FoodSearch';
@@ -12,6 +12,7 @@ class CaloriePage extends Component {
     calories: [],
     email: localStorage.getItem('email'),
     selectedDate: new Date(), // Initializing the selected date to today's date
+    storedCalories: localStorage.getItem('dailyCalories'), // Retrieve stored calories from localStorage
   };
 
   componentDidMount() {
@@ -52,13 +53,22 @@ class CaloriePage extends Component {
   };
 
   render() {
-    const { calories, selectedDate } = this.state;
+    const { calories, selectedDate, storedCalories } = this.state;
 
     return (
       <Box p={5} maxW="1200px" mx="auto">
         <Heading as="h1" size="xl" mb={6} textAlign="center">
           Calories Management
         </Heading>
+        
+        {storedCalories && (
+          <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
+            <Text fontSize="lg">
+              <strong>Stored Daily Caloric Intake:</strong> {storedCalories} calories/day
+            </Text>
+          </Box>
+        )}
+        
         <Box mb={6}>
           <Calendar
             onChange={this.handleDateChange}
