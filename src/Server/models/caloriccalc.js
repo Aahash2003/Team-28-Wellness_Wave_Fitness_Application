@@ -2,13 +2,13 @@ const mongoose = require('mongoose');
 
 // Define the Calc schema
 const calcSchema = new mongoose.Schema({
-    Age: { type: Number, required: true },
-    Gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
-    Height: { type: Number, required: true }, // in cm
-    CurrentWeight: { type: Number, required: true }, // in kg
+    Age: { type: Number, ref: 'profile', required: true },
+    Gender: { type: String, ref: 'profile', required: true },
+    Height: { type: Number, ref: 'profile', required: true }, // in cm
+    CurrentWeight: { type: Number, ref: 'profile', required: true }, // in kg
     TargetWeight: { type: Number, required: true }, // in kg
-    ActivityLevel: { type: String, enum: ['Sedentary', 'Lightly Active', 'Moderately Active', 'Very Active', 'Super Active'], required: true },
-    StartDate: { type: Date, default: Date.now, required: true },
+    ActivityLevel: { type: String, ref: 'profile', required: true },
+    StartDate: { type: Date, required: true },
     EndDate: { type: Date, required: true },
     MacronutrientRatio: {
         Fat: { type: Number, required: true },
