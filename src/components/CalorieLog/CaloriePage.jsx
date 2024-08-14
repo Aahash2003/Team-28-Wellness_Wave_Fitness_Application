@@ -63,8 +63,8 @@ class CaloriePage extends Component {
         
         {storedCalories && (
           <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
-            <Text fontSize="lg">
-              <strong>Stored Daily Caloric Intake:</strong> {storedCalories} calories/day
+            <Text fontSize="large">
+              <strong> Daily Caloric Intake:</strong> {storedCalories} calories/day
             </Text>
           </Box>
         )}

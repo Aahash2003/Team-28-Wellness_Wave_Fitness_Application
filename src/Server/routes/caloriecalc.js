@@ -1,5 +1,6 @@
 const express = require('express');
 const Profile = require('../models/profile');
+const CaloricValue = require('../models/CaloricValue'); // Corrected the import case
 const router = express.Router();
 const dayjs = require('dayjs'); // Import dayjs for date calculations
 const customParseFormat = require('dayjs/plugin/customParseFormat');
@@ -38,6 +39,18 @@ function calculateDailyCalories(calorie_Maintenance, targetWeight, currentWeight
     const dailyCaloricAdjustment = totalCaloriesChange / durationInDays;
 
     return calorie_Maintenance + dailyCaloricAdjustment;
+}
+
+function calculateMacroGrams(dailyCalories, fatPercentage, proteinPercentage, carbPercentage) {
+    const fatCalories = (dailyCalories * (fatPercentage / 100));
+    const proteinCalories = (dailyCalories * (proteinPercentage / 100));
+    const carbCalories = (dailyCalories * (carbPercentage / 100));
+
+    const fatGrams = fatCalories / 9;
+    const proteinGrams = proteinCalories / 4;
+    const carbGrams = carbCalories / 4;
+
+    return { fatGrams, proteinGrams, carbGrams };
 }
 
 // Route to calculate TDEE by email
@@ -109,7 +122,7 @@ router.get('/calculate-DC/:email', async (req, res) => {
             return res.status(400).json({ msg: 'End date must be after start date.' });
         }
         
-        console.log("Days" + durationInDays)
+        console.log("Days" + durationInDays);
         const dailyCalories = calculateDailyCalories(calorie_Maintenance, parseFloat(targetWeight), profile.CurrentWeight, durationInDays);
         
         console.log(`Daily Calories calculated: ${dailyCalories}`);
@@ -120,5 +133,73 @@ router.get('/calculate-DC/:email', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+router.post('/store-caloric-value', async (req, res) => {
+    try {
+        const { email, caloricMaintenance, dailyCalories } = req.body;
+
+        if (!email || (!caloricMaintenance && !dailyCalories)) {
+            return res.status(400).json({ msg: 'Please provide email and at least one caloric value.' });
+        }
+
+        const caloricValue = new CaloricValue({
+            email,
+            caloricMaintenance: caloricMaintenance ? parseFloat(caloricMaintenance) : null,
+            dailyCalories: dailyCalories ? parseFloat(dailyCalories) : null,
+        });
+
+        await caloricValue.save();
+        console.log({ msg: 'Caloric value stored successfully', caloricValue });
+        res.json({ msg: 'Caloric value stored successfully', caloricValue });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+
+// Route to calculate macronutrient grams based on stored caloric value
+router.get('/calculate-macros/:email', async (req, res) => {
+    try {
+        const { email } = req.params;
+        const { fat, protein, carbohydrates, type } = req.query;
+
+        if (!fat || !protein || !carbohydrates || !type) {
+            return res.status(400).json({ msg: 'Please provide all macronutrient percentages and type.' });
+        }
+
+        const totalPercentage = parseFloat(fat) + parseFloat(protein) + parseFloat(carbohydrates);
+        if (totalPercentage !== 100) {
+            return res.status(400).json({ msg: 'Macronutrient percentages must sum to 100%.' });
+        }
+
+        const caloricValue = await CaloricValue.findOne({ email });
+        if (!caloricValue) {
+            return res.status(404).json({ msg: 'Caloric value not found. Please calculate it first.' });
+        }
+
+        let dailyCalories;
+        if (type === 'maintenance') {
+            dailyCalories = caloricValue.caloricMaintenance;
+        } else if (type === 'daily') {
+            dailyCalories = caloricValue.dailyCalories;
+        } else {
+            return res.status(400).json({ msg: 'Invalid type provided. Use "maintenance" or "daily".' });
+        }
+
+        if (!caloricValue) {
+            return res.status(400).json({ msg: `${type} calories not found. Please calculate and store the values first.` });
+        }
+
+        const { fatGrams, proteinGrams, carbGrams } = calculateMacroGrams(dailyCalories, parseFloat(fat), parseFloat(protein), parseFloat(carbohydrates));
+
+        res.json({ fatGrams, proteinGrams, carbGrams });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+
 
 module.exports = router;
