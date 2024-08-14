@@ -13,54 +13,40 @@ class CaloriePage extends Component {
     email: localStorage.getItem('email'),
     selectedDate: new Date(), // Initializing the selected date to today's date
     storedCalories: localStorage.getItem('dailyCalories'), // Retrieve stored calories from localStorage
+    Macros: JSON.parse(localStorage.getItem('MacroGrams')) // Parse the stored macros from JSON string
   };
 
   componentDidMount() {
     this.fetchCalories();
+    this.fetchRemainingCaloriesAndMacros(); // Fetch remaining calories and macros
   }
-
-  // Function to fetch calorie logs for the selected date
-  fetchCalories = async () => {
-    const { email, selectedDate } = this.state;
+  
+  // Function to fetch remaining calories and macros
+  fetchRemainingCaloriesAndMacros = async () => {
+    const { email } = this.state;
     try {
-      const response = await axios.get(`http://localhost:8080/api/calories/user/${email}/calories`, {
-        params: { date: selectedDate.toISOString().split('T')[0] } // Fetch logs for the selected date
+      const response = await axios.get(`http://localhost:8080/api/calc/user/${email}/remaining-calories`);
+      this.setState({
+        remainingCalories: response.data.remainingCalories,
+        remainingProtein: response.data.remainingProtein,
+        remainingCarbs: response.data.remainingCarbs,
+        remainingFats: response.data.remainingFats
       });
-      this.setState({ calories: response.data });
     } catch (error) {
-      console.error('Error fetching calorie data:', error);
-      alert('Error fetching calorie data');
+      console.error('Error fetching remaining calories and macros:', error);
+      alert('Error fetching remaining calories and macros');
     }
   };
-
-  // Function to handle a new log being successfully added
-  handleLogSuccess = () => {
-    this.fetchCalories();
-  };
-
-  // Function to handle a log being deleted
-  handleDeleteSuccess = () => {
-    this.fetchCalories();
-  };
-
-  handleFoodSuccess = () => {
-    this.fetchCalories();
-  };
-
-  // Function to handle date selection from the calendar
-  handleDateChange = (date) => {
-    this.setState({ selectedDate: date }, this.fetchCalories); // Fetch calories for the new date
-  };
-
+  
   render() {
-    const { calories, selectedDate, storedCalories } = this.state;
-
+    const { calories, selectedDate, storedCalories, Macros, remainingCalories, remainingProtein, remainingCarbs, remainingFats } = this.state;
+  
     return (
       <Box p={5} maxW="1200px" mx="auto">
         <Heading as="h1" size="xl" mb={6} textAlign="center">
           Calories Management
         </Heading>
-        
+  
         {storedCalories && (
           <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
             <Text fontSize="large">
@@ -68,7 +54,38 @@ class CaloriePage extends Component {
             </Text>
           </Box>
         )}
-        
+  
+        {Macros && (
+          <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
+            <Text fontSize="large">
+              <strong> Daily Macro Intake:</strong>
+              <br />
+              Fat: {Macros.fatGrams} g/day
+              <br />
+              Protein: {Macros.proteinGrams} g/day
+              <br />
+              Carbohydrates: {Macros.carbGrams} g/day
+            </Text>
+          </Box>
+        )}
+  
+        {remainingCalories !== undefined && (
+          <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
+            <Text fontSize="large">
+              <strong>Remaining Daily Caloric Intake:</strong> {remainingCalories} calories/day
+            </Text>
+            <Text fontSize="large">
+              <strong>Remaining Protein:</strong> {remainingProtein} g/day
+            </Text>
+            <Text fontSize="large">
+              <strong>Remaining Carbs:</strong> {remainingCarbs} g/day
+            </Text>
+            <Text fontSize="large">
+              <strong>Remaining Fats:</strong> {remainingFats} g/day
+            </Text>
+          </Box>
+        )}
+  
         <Box mb={6}>
           <Calendar
             onChange={this.handleDateChange}
@@ -88,7 +105,7 @@ class CaloriePage extends Component {
         </VStack>
       </Box>
     );
+  
   }
 }
-
 export default CaloriePage;
