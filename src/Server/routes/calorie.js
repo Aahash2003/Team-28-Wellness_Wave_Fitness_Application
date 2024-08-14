@@ -177,4 +177,43 @@ router.post('/macros/log', async (req, res) => {
   }
 });
 
+router.get('/user/:email/remaining-calories', async (req, res) => {
+  const { email } = req.params;
+
+  try {
+      const user = await User.findOne({ email }).populate('calories');
+      if (!user) {
+          return res.status(404).send('User not found');
+      }
+
+      // Fetch the stored daily caloric intake
+      const caloricValue = await CaloricValue.findOne({ email });
+      if (!caloricValue || caloricValue.caloricDaily == null) {
+          return res.status(404).json({ msg: 'Daily caloric intake not found. Please store the daily caloric value first.' });
+      }
+
+      // Calculate total logged calories and macros
+      const totalLoggedCalories = user.calories.reduce((total, log) => total + log.calories, 0);
+      const totalLoggedProtein = user.calories.reduce((total, log) => total + log.protein, 0);
+      const totalLoggedCarbs = user.calories.reduce((total, log) => total + log.carbohydrates, 0);
+      const totalLoggedFats = user.calories.reduce((total, log) => total + log.fats, 0);
+
+      // Calculate remaining calories and macros
+      const remainingCalories = caloricValue.caloricDaily - totalLoggedCalories;
+      const remainingProtein = caloricValue.proteinGrams - totalLoggedProtein;
+      const remainingCarbs = caloricValue.carbGrams - totalLoggedCarbs;
+      const remainingFats = caloricValue.fatGrams - totalLoggedFats;
+
+      res.status(200).json({
+          remainingCalories: remainingCalories > 0 ? remainingCalories : 0,
+          remainingProtein: remainingProtein > 0 ? remainingProtein : 0,
+          remainingCarbs: remainingCarbs > 0 ? remainingCarbs : 0,
+          remainingFats: remainingFats > 0 ? remainingFats : 0
+      });
+  } catch (error) {
+      res.status(400).send(error.message);
+  }
+});
+
+
 module.exports = router;

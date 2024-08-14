@@ -82,7 +82,7 @@ const CalorieCalc = () => {
         email,
         [type === 'maintenance' ? 'caloricMaintenance' : 'dailyCalories']: caloricValue,
       });
-      localStorage.setItem('dailyCalories', caloricValue)
+      localStorage.setItem('dailyCalories', caloricValue);
       alert('Caloric value stored successfully!');
     } catch (err) {
       setError('Error storing caloric value. Please try again later.');
@@ -106,11 +106,13 @@ const CalorieCalc = () => {
           carbohydrates: parseFloat(macroForm.carbohydrates),
         },
       });
-      setMacroGrams({
+      const macros = {
         fatGrams: res.data.fatGrams.toFixed(2),
         proteinGrams: res.data.proteinGrams.toFixed(2),
         carbGrams: res.data.carbGrams.toFixed(2),
-      });
+      };
+      setMacroGrams(macros);
+      localStorage.setItem("MacroGrams", JSON.stringify(macros)); // Store the updated macroGrams in local storage
       setError('');
     } catch (err) {
       setError('Error calculating macronutrient grams. Please check your input and try again.');
@@ -120,6 +122,11 @@ const CalorieCalc = () => {
         carbGrams: null,
       });
     }
+  };
+
+  const handleStoreMacros = () => {
+    localStorage.setItem("MacroGrams", JSON.stringify(macroGrams)); // Store the calculated macros in local storage
+    alert('Macros stored successfully!');
   };
 
   return (
@@ -233,6 +240,9 @@ const CalorieCalc = () => {
             <Text><strong>Fat:</strong> {macroGrams.fatGrams} grams/day</Text>
             <Text><strong>Protein:</strong> {macroGrams.proteinGrams} grams/day</Text>
             <Text><strong>Carbohydrates:</strong> {macroGrams.carbGrams} grams/day</Text>
+            <Button colorScheme="blue" mt={4} onClick={handleStoreMacros}>
+              Store Macros
+            </Button>
           </Box>
         )}
       </Box>
