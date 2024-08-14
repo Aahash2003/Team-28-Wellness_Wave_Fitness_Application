@@ -27,6 +27,7 @@ const Navbar = ({ isAuthenticated }) => {
         <a href="#exercises" style={{ textDecoration: 'none', color: '#3A1212' }}>Exercises</a>
         <Link to="/Calories" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Caloric Counter</Link>
         <Link to="/workout" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Workout Log</Link>
+        <Link to="/calc" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Calorie Calculator</Link>
         <Link to="/profile" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Profile</Link>
         {isAuthenticated ? (
           <button 

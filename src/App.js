@@ -17,6 +17,7 @@ import WorkoutLog from './components/WorkoutPage/workout';
 import WorkoutLogger from './components/WorkoutPage/workout';
 import CaloriePage from './components/CalorieLog/CaloriePage';
 import Profile from './components/profile/Profile';
+import CalorieCalc from './components/CalorieCalculator/CalorieCalc';
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -35,6 +36,7 @@ const App = () => {
           <Route path="/" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
           <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
           <Route path="/exercise/:id" element={isAuthenticated ? <ExerciseDetail /> : <Navigate replace to="/login" />} />
+          <Route path="/#exercises" element={isAuthenticated ? <ExerciseDetail /> : <Navigate replace to="/login" />} />
           <Route path="/Calories" element={isAuthenticated ? <CaloriePage /> : <Navigate replace to="/login" />} />
           <Route path="/workout" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
           <Route path="/signup" element={<Signup />} />
@@ -49,7 +51,19 @@ const App = () => {
                   <Profile />
                 </ChakraProvider>
               ) : (
-                <Navigate replace to="/login" />
+                <Navigate replace to="/home" />
+              )
+            }
+          />
+          <Route
+            path="/calc"
+            element={
+              isAuthenticated ? (
+                <ChakraProvider>
+                  <CalorieCalc />
+                </ChakraProvider>
+              ) : (
+                <Navigate replace to="/home" />
               )
             }
           />

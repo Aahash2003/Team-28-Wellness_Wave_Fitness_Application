@@ -1,22 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
-const LogCalories = ({ onLogSuccess }) => {
+const LogCalories = ({ selectedDate, onLogSuccess }) => {
   const email = localStorage.getItem('email');
   const [calories, setCalories] = useState('');
   const [protein, setProtein] = useState('');
   const [carbohydrates, setCarbohydrates] = useState('');
   const [fats, setFats] = useState('');
 
-  useEffect(() => {
-    console.log('Email from local storage:', email); // Debug log
-  }, [email]);
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
       const response = await axios.post('http://localhost:8080/api/calories/logcalories', {
         email,
+        date: selectedDate.toISOString().split('T')[0], // Log calories for the selected date
         calories,
         protein,
         carbohydrates,
@@ -37,6 +34,8 @@ const LogCalories = ({ onLogSuccess }) => {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Log Calories</h2>
+      <p>Logging calories for {new Date().toDateString()}</p>
+
       <input
         type="number"
         placeholder="Calories"

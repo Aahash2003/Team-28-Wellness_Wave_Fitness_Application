@@ -32,12 +32,12 @@ function calculateTDEE(age, gender, height, weight, activityLevel) {
     return BMR * multiplier;
 }
 
-function calculateDailyCalories(tdee, targetWeight, currentWeight, durationInDays) {
+function calculateDailyCalories(calorie_Maintenance, targetWeight, currentWeight, durationInDays) {
     const weightDifference = targetWeight - currentWeight;
     const totalCaloriesChange = weightDifference * 7700; // 1 kg = 7700 calories
     const dailyCaloricAdjustment = totalCaloriesChange / durationInDays;
 
-    return tdee + dailyCaloricAdjustment;
+    return calorie_Maintenance + dailyCaloricAdjustment;
 }
 
 // Route to calculate TDEE by email
@@ -74,7 +74,7 @@ router.get('/calculate/:email', async (req, res) => {
 router.get('/calculate-DC/:email', async (req, res) => {
     try {
         const { email } = req.params;
-        const { targetWeight, startDate, endDate } = req.body;
+        const { targetWeight, startDate, endDate } = req.query;
 
         if (!targetWeight || !startDate || !endDate) {
             return res.status(400).json({ msg: 'Please provide target weight, start date, and end date.' });
@@ -95,9 +95,9 @@ router.get('/calculate-DC/:email', async (req, res) => {
         // Log the values for debugging
         console.log(`Calculating TDEE for: age=${age}, gender=${profile.Gender}, height=${profile.Height}, weight=${profile.CurrentWeight}, activityLevel=${profile.ActivityLevel}`);
         
-        const tdee = calculateTDEE(age, profile.Gender, profile.Height, profile.CurrentWeight, profile.ActivityLevel);
+        const calorie_Maintenance = calculateTDEE(age, profile.Gender, profile.Height, profile.CurrentWeight, profile.ActivityLevel);
         
-        console.log(`TDEE calculated: ${tdee}`);
+        console.log(`TDEE calculated: ${calorie_Maintenance}`);
         
         // Parse startDate and endDate using dayjs
         const parsedStartDate = dayjs(startDate, ['YYYY-MM-DD', 'MM/DD/YYYY']);
@@ -110,11 +110,11 @@ router.get('/calculate-DC/:email', async (req, res) => {
         }
         
         console.log("Days" + durationInDays)
-        const dailyCalories = calculateDailyCalories(tdee, parseFloat(targetWeight), profile.CurrentWeight, durationInDays);
+        const dailyCalories = calculateDailyCalories(calorie_Maintenance, parseFloat(targetWeight), profile.CurrentWeight, durationInDays);
         
         console.log(`Daily Calories calculated: ${dailyCalories}`);
         
-        res.json({ dailyCalories });
+        res.json({ dailyCalories, calorie_Maintenance });
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
