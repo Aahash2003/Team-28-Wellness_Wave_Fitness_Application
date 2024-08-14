@@ -1,25 +1,30 @@
 import React, { Component } from 'react';
-import { Box } from '@mui/material';
+import { Box, Heading, VStack } from '@chakra-ui/react';
 import LogCalories from './LogCalories';
 import ViewCalories from './ViewCalories';
 import FoodSearch from './FoodSearch';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 import axios from 'axios';
 
 class CaloriePage extends Component {
   state = {
     calories: [],
     email: localStorage.getItem('email'),
+    selectedDate: new Date(), // Initializing the selected date to today's date
   };
 
   componentDidMount() {
     this.fetchCalories();
   }
 
-  // Function to fetch calorie logs
+  // Function to fetch calorie logs for the selected date
   fetchCalories = async () => {
-    const { email } = this.state;
+    const { email, selectedDate } = this.state;
     try {
-      const response = await axios.get(`http://localhost:8080/api/calories/user/${email}/calories`);
+      const response = await axios.get(`http://localhost:8080/api/calories/user/${email}/calories`, {
+        params: { date: selectedDate.toISOString().split('T')[0] } // Fetch logs for the selected date
+      });
       this.setState({ calories: response.data });
     } catch (error) {
       console.error('Error fetching calorie data:', error);
@@ -39,23 +44,38 @@ class CaloriePage extends Component {
 
   handleFoodSuccess = () => {
     this.fetchCalories();
-  }
+  };
+
+  // Function to handle date selection from the calendar
+  handleDateChange = (date) => {
+    this.setState({ selectedDate: date }, this.fetchCalories); // Fetch calories for the new date
+  };
 
   render() {
-    const { calories } = this.state;
+    const { calories, selectedDate } = this.state;
 
     return (
-      <Box className="calories-page-container">
-        <h1>Calories Management</h1>
-        <Box className="calories-page-section">
-          <FoodSearch onFoodSuccess={this.handleFoodSuccess}/>
+      <Box p={5} maxW="1200px" mx="auto">
+        <Heading as="h1" size="xl" mb={6} textAlign="center">
+          Calories Management
+        </Heading>
+        <Box mb={6}>
+          <Calendar
+            onChange={this.handleDateChange}
+            value={selectedDate}
+          />
         </Box>
-        <Box className="calories-page-section">
-          <LogCalories onLogSuccess={this.handleLogSuccess} />
-        </Box>
-        <Box className="calories-page-section">
-          <ViewCalories calories={calories} onDeleteSuccess={this.handleDeleteSuccess} />
-        </Box>
+        <VStack spacing={6}>
+          <Box w="100%" p={5} borderWidth="1px" borderRadius="md" boxShadow="md">
+            <FoodSearch selectedDate={selectedDate} onFoodSuccess={this.handleFoodSuccess} />
+          </Box>
+          <Box w="100%" p={5} borderWidth="1px" borderRadius="md" boxShadow="md">
+            <LogCalories selectedDate={selectedDate} onLogSuccess={this.handleLogSuccess} />
+          </Box>
+          <Box w="100%" p={5} borderWidth="1px" borderRadius="md" boxShadow="md">
+            <ViewCalories calories={calories} selectedDate={selectedDate} onDeleteSuccess={this.handleDeleteSuccess} />
+          </Box>
+        </VStack>
       </Box>
     );
   }

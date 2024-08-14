@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const FoodSearch = ({onFoodSuccess}) => {
+const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
   const [query, setQuery] = useState('');
   const [macros, setMacros] = useState(null);
   const email = localStorage.getItem('email');
@@ -22,6 +22,7 @@ const FoodSearch = ({onFoodSuccess}) => {
       try {
         const response = await axios.post('http://localhost:8080/api/calories/macros/log', {
           email,
+          date: selectedDate.toISOString().split('T')[0], // Log food for the selected date
           item: macros.item,
           calories: macros.calories,
           protein: macros.proteins,
@@ -57,7 +58,7 @@ const FoodSearch = ({onFoodSuccess}) => {
           <p>Fats: {macros.fats} g</p>
           <p>Proteins: {macros.proteins} g</p>
           <p>Calories: {macros.calories} kcal</p>
-          <button onClick={handleLogFood}>Log Food to Calorie Log</button>
+          <button onClick={handleLogFood}>Log Food to Calorie Log for {new Date().toDateString()}</button>
         </div>
       )}
     </div>
