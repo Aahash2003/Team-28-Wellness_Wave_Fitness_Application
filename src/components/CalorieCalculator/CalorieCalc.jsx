@@ -82,6 +82,7 @@ const CalorieCalc = () => {
         email,
         [type === 'maintenance' ? 'caloricMaintenance' : 'dailyCalories']: caloricValue,
       });
+      localStorage.setItem('dailyCalories', caloricValue)
       alert('Caloric value stored successfully!');
     } catch (err) {
       setError('Error storing caloric value. Please try again later.');
