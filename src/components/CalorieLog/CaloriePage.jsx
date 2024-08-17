@@ -60,7 +60,29 @@ class CaloriePage extends Component {
       alert('Error fetching remaining calories and macros');
     }
   };
-
+/*
+{storedCalories && (
+          <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
+            <Text fontSize="large">
+              <strong> Daily Caloric Intake:</strong> {storedCalories} calories/day
+            </Text>
+          </Box>
+        )}
+  
+        {Macros && (
+          <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
+            <Text fontSize="large">
+              <strong> Daily Macro Intake:</strong>
+              <br />
+              Fat: {Macros.fatGrams} g/day
+              <br />
+              Protein: {Macros.proteinGrams} g/day
+              <br />
+              Carbohydrates: {Macros.carbGrams} g/day
+            </Text>
+          </Box>
+        )}
+*/
   handleLogSuccess = () => {
     this.fetchCalories();
   };
@@ -91,27 +113,6 @@ class CaloriePage extends Component {
           Calories Management
         </Heading>
   
-        {storedCalories && (
-          <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
-            <Text fontSize="large">
-              <strong> Daily Caloric Intake:</strong> {storedCalories} calories/day
-            </Text>
-          </Box>
-        )}
-  
-        {Macros && (
-          <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
-            <Text fontSize="large">
-              <strong> Daily Macro Intake:</strong>
-              <br />
-              Fat: {Macros.fatGrams} g/day
-              <br />
-              Protein: {Macros.proteinGrams} g/day
-              <br />
-              Carbohydrates: {Macros.carbGrams} g/day
-            </Text>
-          </Box>
-        )}
   
         {remainingCalories !== undefined && (
           <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
