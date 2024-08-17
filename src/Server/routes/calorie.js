@@ -11,6 +11,9 @@ const envPath = path.resolve(__dirname,'../utils/.env');
 console.log("dotenv")
 dotenv.config({ path: envPath });
 // Log a new CalorieData
+
+
+
 router.post('/logcalories', async (req, res) => {
     const { email, calories, protein, carbohydrates, fats } = req.body;
 

@@ -249,27 +249,44 @@ router.post('/store-macros/:email', async (req, res) => {
 
 router.get('/user/:email/remaining-calories', async (req, res) => {
     const { email } = req.params;
+    const { date } = req.query;  // Accept the date as a query parameter
+
+    if (!date) {
+        return res.status(400).send('Date is required');
+    }
+
+    // Parse the date from the query parameter
+    const selectedDate = new Date(date);
+
+    if (isNaN(selectedDate.getTime())) {
+        return res.status(400).send('Invalid date format');
+    }
+
+    // Normalize the date to the start and end of the day to filter the logs in UTC
+    const startOfDay = new Date(Date.UTC(selectedDate.getUTCFullYear(), selectedDate.getUTCMonth(), selectedDate.getUTCDate(), 0, 0, 0, 0));
+    const endOfDay = new Date(Date.UTC(selectedDate.getUTCFullYear(), selectedDate.getUTCMonth(), selectedDate.getUTCDate(), 23, 59, 59, 999));
 
     try {
-        // Populate the 'calories' field to retrieve the actual calorie logs
-        const user = await User.findOne({ email }).populate('calories'); // Change 'CaloricValue' to 'calories'
+        // Populate the 'calories' field with logs filtered by date
+        const user = await User.findOne({ email }).populate({
+            path: 'calories',
+            match: {
+                date: { $gte: startOfDay, $lte: endOfDay }  // Filter logs by the selected date in UTC
+            }
+        });
+
         if (!user) {
             return res.status(404).send('User not found');
         }
-
+        console.log("Start of Day:", startOfDay);
+        console.log("End of Day:", endOfDay);
+        console.log("Logs:", user.calories);
+        
         // Fetch the stored daily caloric intake
         const caloricValue = await CaloricValue.findOne({ email });
-        console.log("CaloricValue:", caloricValue);
-        
-        if (!caloricValue || caloricValue.dailyCalories == null && caloricValue.caloricMaintenance == null) {
+        if (!caloricValue || (caloricValue.dailyCalories == null && caloricValue.caloricMaintenance == null)) {
             return res.status(404).json({ msg: 'Daily caloric intake not found. Please store the daily caloric value first.' });
         }
-
-        // Log each calorie entry to inspect the data structure
-        user.calories.forEach(log => {
-            console.log("Log Entry:", log);
-            console.log("Calories:", log.calories, "Type:", typeof log.calories);
-        });
 
         // Calculate total logged calories and macros
         const totalLoggedCalories = user.calories.reduce((total, log) => total + log.calories, 0);
@@ -277,34 +294,28 @@ router.get('/user/:email/remaining-calories', async (req, res) => {
         const totalLoggedCarbs = user.calories.reduce((total, log) => total + log.carbohydrates, 0);
         const totalLoggedFats = user.calories.reduce((total, log) => total + log.fats, 0);
 
-        console.log("Total Calories:", totalLoggedCalories);
-        console.log("Total Protein:", totalLoggedProtein);
-        console.log("Total Carbs:", totalLoggedCarbs);
-        console.log("Total Fats:", totalLoggedFats);
+        // Determine which value to use for remaining calories
+        const baseCalories = caloricValue.caloricMaintenance || caloricValue.dailyCalories;
 
         // Calculate remaining calories and macros
-        daily = caloricValue.dailyCalories
-        if(!caloricValue.dailyCalories){
-            daily = caloricValue.caloricMaintenance
-        }
-        const remainingCalories = daily - totalLoggedCalories;
+        const remainingCalories = baseCalories - totalLoggedCalories;
         const remainingProtein = caloricValue.proteinGrams - totalLoggedProtein;
         const remainingCarbs = caloricValue.carbGrams - totalLoggedCarbs;
         const remainingFats = caloricValue.fatGrams - totalLoggedFats;
 
-        console.log("Total remaining:", caloricValue.proteinGrams, + " " ,remainingProtein);
-        
-
         res.status(200).json({
-            remainingCalories: remainingCalories,
-            remainingProtein: remainingProtein,
-            remainingCarbs: remainingCarbs,
-            remainingFats: remainingFats
+            remainingCalories: remainingCalories > 0 ? remainingCalories : 0,
+            remainingProtein: remainingProtein > 0 ? remainingProtein : 0,
+            remainingCarbs: remainingCarbs > 0 ? remainingCarbs : 0,
+            remainingFats: remainingFats > 0 ? remainingFats : 0
         });
     } catch (error) {
         res.status(400).send(error.message);
     }
 });
+
+
+
 
 
 module.exports = router;
