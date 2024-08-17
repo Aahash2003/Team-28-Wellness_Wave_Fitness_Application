@@ -21,21 +21,53 @@ class CaloriePage extends Component {
     this.fetchRemainingCaloriesAndMacros(); // Fetch remaining calories and macros
   }
   
+  fetchCalories = async () => {
+    const { email, selectedDate } = this.state;
+    try {
+      const response = await axios.get(`http://localhost:8080/api/calories/user/${email}/calories`, {
+        params: { date: selectedDate.toISOString().split('T')[0] } // Fetch logs for the selected date
+      });
+      this.setState({ calories: response.data });
+    } catch (error) {
+      console.error('Error fetching calorie data:', error);
+      alert('Error fetching calorie data');
+    }
+  };
   // Function to fetch remaining calories and macros
   fetchRemainingCaloriesAndMacros = async () => {
     const { email } = this.state;
     try {
       const response = await axios.get(`http://localhost:8080/api/calc/user/${email}/remaining-calories`);
+      const remainingCalories = parseFloat(response.data.remainingCalories).toFixed(2);
+      const remainingProtein = parseFloat(response.data.remainingProtein).toFixed(2);
+      const remainingCarbs = parseFloat(response.data.remainingCarbs).toFixed(2);
+      const remainingFats = parseFloat(response.data.remainingFats).toFixed(2);
       this.setState({
-        remainingCalories: response.data.remainingCalories,
-        remainingProtein: response.data.remainingProtein,
-        remainingCarbs: response.data.remainingCarbs,
-        remainingFats: response.data.remainingFats
+        remainingCalories: remainingCalories,
+        remainingProtein: remainingProtein,
+        remainingCarbs: remainingCarbs,
+        remainingFats: remainingFats
       });
     } catch (error) {
       console.error('Error fetching remaining calories and macros:', error);
       alert('Error fetching remaining calories and macros');
     }
+  };
+
+   // Function to handle a new log being successfully added
+   handleLogSuccess = () => {
+    this.fetchCalories();
+  };
+  // Function to handle a log being deleted
+  handleDeleteSuccess = () => {
+    this.fetchCalories();
+  };
+  handleFoodSuccess = () => {
+    this.fetchCalories();
+  };
+  // Function to handle date selection from the calendar
+  handleDateChange = (date) => {
+    this.setState({ selectedDate: date }, this.fetchCalories); // Fetch calories for the new date
   };
   
   render() {

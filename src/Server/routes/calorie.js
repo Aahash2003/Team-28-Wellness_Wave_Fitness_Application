@@ -1,6 +1,7 @@
 const express = require('express');
 const { User } = require('../models/user');
 const CalorieData = require('../models/calorielog');
+const calorie_Maintenance = require('../models/CaloricValue')
 const dotenv = require('dotenv');
 const axios = require('axios');
 const path = require('path');
@@ -181,14 +182,14 @@ router.get('/user/:email/remaining-calories', async (req, res) => {
   const { email } = req.params;
 
   try {
-      const user = await User.findOne({ email }).populate('calories');
+      const user = await User.findOne({ email }).populate('CaloricValue');
       if (!user) {
           return res.status(404).send('User not found');
       }
 
       // Fetch the stored daily caloric intake
-      const caloricValue = await CaloricValue.findOne({ email });
-      if (!caloricValue || caloricValue.caloricDaily == null) {
+      const caloricValue = await calorie_Maintenance.findOne({ email });
+      if (!caloricValue || caloricValue.dailyCalories == null || caloricValue.caloricMaintenance == null) {
           return res.status(404).json({ msg: 'Daily caloric intake not found. Please store the daily caloric value first.' });
       }
 

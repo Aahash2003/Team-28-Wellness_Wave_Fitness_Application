@@ -1,5 +1,6 @@
 const express = require('express');
 const Profile = require('../models/profile');
+const { User } = require('../models/user');
 const CaloricValue = require('../models/CaloricValue'); // Corrected the import case
 const router = express.Router();
 const dayjs = require('dayjs'); // Import dayjs for date calculations
@@ -246,6 +247,64 @@ router.post('/store-macros/:email', async (req, res) => {
     }
 });
 
+router.get('/user/:email/remaining-calories', async (req, res) => {
+    const { email } = req.params;
+
+    try {
+        // Populate the 'calories' field to retrieve the actual calorie logs
+        const user = await User.findOne({ email }).populate('calories'); // Change 'CaloricValue' to 'calories'
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Fetch the stored daily caloric intake
+        const caloricValue = await CaloricValue.findOne({ email });
+        console.log("CaloricValue:", caloricValue);
+        
+        if (!caloricValue || caloricValue.dailyCalories == null && caloricValue.caloricMaintenance == null) {
+            return res.status(404).json({ msg: 'Daily caloric intake not found. Please store the daily caloric value first.' });
+        }
+
+        // Log each calorie entry to inspect the data structure
+        user.calories.forEach(log => {
+            console.log("Log Entry:", log);
+            console.log("Calories:", log.calories, "Type:", typeof log.calories);
+        });
+
+        // Calculate total logged calories and macros
+        const totalLoggedCalories = user.calories.reduce((total, log) => total + log.calories, 0);
+        const totalLoggedProtein = user.calories.reduce((total, log) => total + log.protein, 0);
+        const totalLoggedCarbs = user.calories.reduce((total, log) => total + log.carbohydrates, 0);
+        const totalLoggedFats = user.calories.reduce((total, log) => total + log.fats, 0);
+
+        console.log("Total Calories:", totalLoggedCalories);
+        console.log("Total Protein:", totalLoggedProtein);
+        console.log("Total Carbs:", totalLoggedCarbs);
+        console.log("Total Fats:", totalLoggedFats);
+
+        // Calculate remaining calories and macros
+        daily = caloricValue.dailyCalories
+        if(!caloricValue.dailyCalories){
+            daily = caloricValue.caloricMaintenance
+        }
+        const remainingCalories = daily - totalLoggedCalories;
+        const remainingProtein = caloricValue.proteinGrams - totalLoggedProtein;
+        const remainingCarbs = caloricValue.carbGrams - totalLoggedCarbs;
+        const remainingFats = caloricValue.fatGrams - totalLoggedFats;
+
+        console.log("Total remaining:", caloricValue.proteinGrams, + " " ,remainingProtein);
+        
+
+        res.status(200).json({
+            remainingCalories: remainingCalories,
+            remainingProtein: remainingProtein,
+            remainingCarbs: remainingCarbs,
+            remainingFats: remainingFats
+        });
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
 
 
 module.exports = router;
