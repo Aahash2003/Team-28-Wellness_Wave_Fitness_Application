@@ -7,7 +7,8 @@ const calorieSchema = new mongoose.Schema({
     protein: {type: Number, required: true},
     carbohydrates: {type: Number, required: true},
     fats: {type: Number, required: true},
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    
 });
 
 const Calories = mongoose.model('Calories', calorieSchema);

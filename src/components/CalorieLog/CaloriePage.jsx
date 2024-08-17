@@ -13,7 +13,11 @@ class CaloriePage extends Component {
     email: localStorage.getItem('email'),
     selectedDate: new Date(), // Initializing the selected date to today's date
     storedCalories: localStorage.getItem('dailyCalories'), // Retrieve stored calories from localStorage
-    Macros: JSON.parse(localStorage.getItem('MacroGrams')) // Parse the stored macros from JSON string
+    Macros: JSON.parse(localStorage.getItem('MacroGrams')), // Parse the stored macros from JSON string
+    remainingCalories: undefined,
+    remainingProtein: undefined,
+    remainingCarbs: undefined,
+    remainingFats: undefined
   };
 
   componentDidMount() {
@@ -33,11 +37,14 @@ class CaloriePage extends Component {
       alert('Error fetching calorie data');
     }
   };
-  // Function to fetch remaining calories and macros
+
   fetchRemainingCaloriesAndMacros = async () => {
-    const { email } = this.state;
+    const { email, selectedDate } = this.state;
     try {
-      const response = await axios.get(`http://localhost:8080/api/calc/user/${email}/remaining-calories`);
+      const response = await axios.get(`http://localhost:8080/api/calc/user/${email}/remaining-calories`, {
+        params: { date: selectedDate.toISOString().split('T')[0] } // Pass the selected date to the backend
+      });
+      console.log("API Response:", response.data);
       const remainingCalories = parseFloat(response.data.remainingCalories).toFixed(2);
       const remainingProtein = parseFloat(response.data.remainingProtein).toFixed(2);
       const remainingCarbs = parseFloat(response.data.remainingCarbs).toFixed(2);
@@ -54,22 +61,27 @@ class CaloriePage extends Component {
     }
   };
 
-   // Function to handle a new log being successfully added
-   handleLogSuccess = () => {
+  handleLogSuccess = () => {
     this.fetchCalories();
   };
-  // Function to handle a log being deleted
+
   handleDeleteSuccess = () => {
     this.fetchCalories();
   };
+
   handleFoodSuccess = () => {
     this.fetchCalories();
   };
-  // Function to handle date selection from the calendar
+
   handleDateChange = (date) => {
-    this.setState({ selectedDate: date }, this.fetchCalories); // Fetch calories for the new date
-  };
-  
+    console.log("Date selected:", date); // Log the date selected in the calendar
+    this.setState({ selectedDate: date }, () => {
+        console.log("State after date change:", this.state.selectedDate); // Log the state after updating the date
+        this.fetchCalories(); // Fetch calories for the new date
+        this.fetchRemainingCaloriesAndMacros(); // Fetch remaining calories and macros for the new date
+    });
+};
+
   render() {
     const { calories, selectedDate, storedCalories, Macros, remainingCalories, remainingProtein, remainingCarbs, remainingFats } = this.state;
   
@@ -137,7 +149,7 @@ class CaloriePage extends Component {
         </VStack>
       </Box>
     );
-  
   }
 }
+
 export default CaloriePage;
