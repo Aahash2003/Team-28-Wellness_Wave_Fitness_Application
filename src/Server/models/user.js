@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const Joi = require("joi");
 const passwordComplexity = require("joi-password-complexity");
 const token = require("./token");
+const CaloricValue = require("./CaloricValue");
 require('dotenv').config();
 const JWTPRIVATEKEY= "nUnhO+b/IJ2viBa/dbaFlBMmwkcUht99s/Hn681YqVY="
 const userSchema = new mongoose.Schema({
@@ -18,7 +19,8 @@ const userSchema = new mongoose.Schema({
 	verified: { type: Boolean, default: false },
 	disabled: { type: Boolean, default: false },
 	workouts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Workout' }],
-	calories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Calories' }]
+	calories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Calories' }],
+	CaloricValue: [{ type: mongoose.Schema.Types.ObjectId, ref: 'CaloricValue' }],
 });
 
 userSchema.methods.generateAuthToken = function () {
