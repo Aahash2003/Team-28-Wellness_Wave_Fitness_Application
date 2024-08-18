@@ -8,11 +8,24 @@ const ViewCalories = ({ calories, selectedDate, onDeleteSuccess }) => {
   const email = localStorage.getItem('email');
 
   useEffect(() => {
-    // Filter the calories based on the selected date
+    // Convert selectedDate to UTC for accurate comparison
+    const selectedDateUTC = new Date(Date.UTC(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate()
+    ));
+
+    // Filter the calories based on the selected date (in UTC)
     const filtered = calories.filter((log) => {
-      const logDate = new Date(log.date); // Assuming each log has a date field
-      return logDate.toDateString() === selectedDate.toDateString();
+      const logDate = new Date(log.date);
+      const logDateUTC = new Date(Date.UTC(
+        logDate.getFullYear(),
+        logDate.getMonth(),
+        logDate.getDate()
+      ));
+      return logDateUTC.toDateString() === selectedDateUTC.toDateString();
     });
+
     setFilteredCalories(filtered);
   }, [selectedDate, calories]);
 

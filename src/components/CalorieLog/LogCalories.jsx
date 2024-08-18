@@ -10,15 +10,25 @@ const LogCalories = ({ selectedDate, onLogSuccess }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    
     try {
+      // Convert the selected date to UTC for the backend
+      const localDate = new Date(selectedDate);
+      const utcDate = new Date(Date.UTC(
+        localDate.getFullYear(),
+        localDate.getMonth(),
+        localDate.getDate()
+      ));
+
       const response = await axios.post('http://localhost:8080/api/calories/logcalories', {
         email,
-        date: selectedDate.toISOString().split('T')[0], // Log calories for the selected date
+        localDate: utcDate.toISOString(), // Send the date in UTC format
         calories,
         protein,
         carbohydrates,
         fats,
       });
+
       alert(response.data);
       setCalories(''); // Clear the form fields
       setProtein('');
@@ -34,7 +44,7 @@ const LogCalories = ({ selectedDate, onLogSuccess }) => {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Log Calories</h2>
-      <p>Logging calories for {new Date().toDateString()}</p>
+      <p>Logging calories for {selectedDate.toDateString()}</p>
 
       <input
         type="number"

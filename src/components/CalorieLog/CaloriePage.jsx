@@ -11,9 +11,9 @@ class CaloriePage extends Component {
   state = {
     calories: [],
     email: localStorage.getItem('email'),
-    selectedDate: new Date(), // Initializing the selected date to today's date
-    storedCalories: localStorage.getItem('dailyCalories'), // Retrieve stored calories from localStorage
-    Macros: JSON.parse(localStorage.getItem('MacroGrams')), // Parse the stored macros from JSON string
+    selectedDate: new Date(),
+    storedCalories: localStorage.getItem('dailyCalories'),
+    Macros: JSON.parse(localStorage.getItem('MacroGrams')),
     remainingCalories: undefined,
     remainingProtein: undefined,
     remainingCarbs: undefined,
@@ -22,16 +22,22 @@ class CaloriePage extends Component {
 
   componentDidMount() {
     this.fetchCalories();
-    this.fetchRemainingCaloriesAndMacros(); // Fetch remaining calories and macros
+    this.fetchRemainingCaloriesAndMacros();
   }
   
   fetchCalories = async () => {
     const { email, selectedDate } = this.state;
     try {
+      const utcDate = this.convertToUTC(selectedDate);
       const response = await axios.get(`http://localhost:8080/api/calories/user/${email}/calories`, {
-        params: { date: selectedDate.toISOString().split('T')[0] } // Fetch logs for the selected date
+        params: { date: utcDate.toISOString().split('T')[0] }
       });
-      this.setState({ calories: response.data });
+      // Convert each log's date from UTC to local time before updating the state
+      const calories = response.data.map(log => ({
+        ...log,
+        date: new Date(log.date).toLocaleString(), // Convert from UTC to local time
+      }));
+      this.setState({ calories });
     } catch (error) {
       console.error('Error fetching calorie data:', error);
       alert('Error fetching calorie data');
@@ -41,8 +47,9 @@ class CaloriePage extends Component {
   fetchRemainingCaloriesAndMacros = async () => {
     const { email, selectedDate } = this.state;
     try {
+      const utcDate = this.convertToUTC(selectedDate);
       const response = await axios.get(`http://localhost:8080/api/calc/user/${email}/remaining-calories`, {
-        params: { date: selectedDate.toISOString().split('T')[0] } // Pass the selected date to the backend
+        params: { date: utcDate.toISOString().split('T')[0] }
       });
       console.log("API Response:", response.data);
       const remainingCalories = parseFloat(response.data.remainingCalories).toFixed(2);
@@ -50,59 +57,44 @@ class CaloriePage extends Component {
       const remainingCarbs = parseFloat(response.data.remainingCarbs).toFixed(2);
       const remainingFats = parseFloat(response.data.remainingFats).toFixed(2);
       this.setState({
-        remainingCalories: remainingCalories,
-        remainingProtein: remainingProtein,
-        remainingCarbs: remainingCarbs,
-        remainingFats: remainingFats
+        remainingCalories,
+        remainingProtein,
+        remainingCarbs,
+        remainingFats
       });
     } catch (error) {
       console.error('Error fetching remaining calories and macros:', error);
       alert('Error fetching remaining calories and macros');
     }
   };
-/*
-{storedCalories && (
-          <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
-            <Text fontSize="large">
-              <strong> Daily Caloric Intake:</strong> {storedCalories} calories/day
-            </Text>
-          </Box>
-        )}
-  
-        {Macros && (
-          <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">
-            <Text fontSize="large">
-              <strong> Daily Macro Intake:</strong>
-              <br />
-              Fat: {Macros.fatGrams} g/day
-              <br />
-              Protein: {Macros.proteinGrams} g/day
-              <br />
-              Carbohydrates: {Macros.carbGrams} g/day
-            </Text>
-          </Box>
-        )}
-*/
+
   handleLogSuccess = () => {
     this.fetchCalories();
+    this.fetchRemainingCaloriesAndMacros(); // Update macros as well
   };
 
   handleDeleteSuccess = () => {
     this.fetchCalories();
+    this.fetchRemainingCaloriesAndMacros(); // Update macros as well
   };
 
   handleFoodSuccess = () => {
     this.fetchCalories();
+    this.fetchRemainingCaloriesAndMacros(); // Update macros as well
   };
 
   handleDateChange = (date) => {
-    console.log("Date selected:", date); // Log the date selected in the calendar
+    console.log("Date selected:", date);
     this.setState({ selectedDate: date }, () => {
-        console.log("State after date change:", this.state.selectedDate); // Log the state after updating the date
-        this.fetchCalories(); // Fetch calories for the new date
-        this.fetchRemainingCaloriesAndMacros(); // Fetch remaining calories and macros for the new date
+        console.log("State after date change:", this.state.selectedDate);
+        this.fetchCalories();
+        this.fetchRemainingCaloriesAndMacros();
     });
-};
+  };
+
+  convertToUTC = (date) => {
+    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  };
 
   render() {
     const { calories, selectedDate, storedCalories, Macros, remainingCalories, remainingProtein, remainingCarbs, remainingFats } = this.state;
@@ -112,7 +104,6 @@ class CaloriePage extends Component {
         <Heading as="h1" size="xl" mb={6} textAlign="center">
           Calories Management
         </Heading>
-  
   
         {remainingCalories !== undefined && (
           <Box mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="md" textAlign="center">

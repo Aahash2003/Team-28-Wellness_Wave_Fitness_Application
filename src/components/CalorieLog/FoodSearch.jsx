@@ -19,10 +19,18 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
 
   const handleLogFood = async () => {
     if (macros) {
+      // Convert the selected date to UTC before logging
+      const localDate = new Date(selectedDate);
+      const utcDate = new Date(Date.UTC(
+        localDate.getFullYear(),
+        localDate.getMonth(),
+        localDate.getDate()
+      ));
+
       try {
         const response = await axios.post('http://localhost:8080/api/calories/macros/log', {
           email,
-          date: selectedDate.toISOString().split('T')[0], // Log food for the selected date
+          date: utcDate.toISOString(), // Send the date in UTC format
           item: macros.item,
           calories: macros.calories,
           protein: macros.proteins,
@@ -31,6 +39,8 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
         });
         alert('Food item logged successfully');
         onFoodSuccess();
+        setMacros(null); // Clear the macros after logging
+        setQuery(''); // Clear the query after logging
       } catch (error) {
         console.error(error);
         alert('Error logging food item');
@@ -58,7 +68,7 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
           <p>Fats: {macros.fats} g</p>
           <p>Proteins: {macros.proteins} g</p>
           <p>Calories: {macros.calories} kcal</p>
-          <button onClick={handleLogFood}>Log Food to Calorie Log for {new Date().toDateString()}</button>
+          <button onClick={handleLogFood}>Log Food to Calorie Log for {selectedDate.toDateString()}</button>
         </div>
       )}
     </div>
