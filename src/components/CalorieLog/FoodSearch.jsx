@@ -4,12 +4,13 @@ import axios from 'axios';
 const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
   const [query, setQuery] = useState('');
   const [macros, setMacros] = useState(null);
+  const [servings, setServings] = useState(1); // New state for servings
   const email = localStorage.getItem('email');
 
   const handleSearch = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.get(`http://localhost:8080/api/calories/macros?query=${query}`);
+      const response = await axios.get(`http://localhost:8080/api/calories/macros?query=${query}&servings=${servings}`);
       setMacros(response.data);
     } catch (error) {
       console.error(error);
@@ -35,12 +36,11 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
           calories: macros.calories,
           protein: macros.proteins,
           carbohydrates: macros.carbohydrates,
-          fats: macros.fats
+          fats: macros.fats,
+          servings
         });
         alert('Food item logged successfully');
         onFoodSuccess();
-        setMacros(null); // Clear the macros after logging
-        setQuery(''); // Clear the query after logging
       } catch (error) {
         console.error(error);
         alert('Error logging food item');
@@ -59,6 +59,14 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
           onChange={(e) => setQuery(e.target.value)}
           required
         />
+        <input
+          type="number"
+          placeholder="Servings"
+          value={servings}
+          onChange={(e) => setServings(e.target.value)}
+          required
+          min="1"
+        />
         <button type="submit">Search</button>
       </form>
       {macros && (
@@ -68,7 +76,9 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
           <p>Fats: {macros.fats} g</p>
           <p>Proteins: {macros.proteins} g</p>
           <p>Calories: {macros.calories} kcal</p>
-          <button onClick={handleLogFood}>Log Food to Calorie Log for {selectedDate.toDateString()}</button>
+          <button onClick={handleLogFood}>
+            Log {servings} serving(s) to Calorie Log for {selectedDate.toDateString()}
+          </button>
         </div>
       )}
     </div>

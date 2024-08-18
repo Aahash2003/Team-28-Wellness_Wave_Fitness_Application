@@ -100,102 +100,81 @@ router.delete('/logcalories/:id', async (req, res) => {
 });
 
 router.get('/macros', async (req, res) => {
-    const { query } = req.query;
-  
-    if (!query) {
+  const { query, servings = 1 } = req.query; // Default to 1 serving if not specified
+
+  if (!query) {
       return res.status(400).json({ error: 'Query parameter is required' });
-    }
-  
-    try {
-      // Log the start of the request
+  }
+
+  try {
       console.log(`Received request for item: ${query}`);
-  
+
       // Search for the food item
       const searchResponse = await axios.get(
-        `https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=${process.env.USDA_API_KEY}`
+          `https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=${process.env.USDA_API_KEY}`
       );
-  
-      // Log the search response
-      console.log('Search response:', searchResponse.data);
-  
+
       if (searchResponse.data.foods.length === 0) {
-        return res.status(404).json({ error: 'No food item found' });
+          return res.status(404).json({ error: 'No food item found' });
       }
-  
+
       // Get the food ID of the first search result
       const foodId = searchResponse.data.foods[0].fdcId;
-  
+
       // Get detailed information about the food item
       const foodResponse = await axios.get(
-        `https://api.nal.usda.gov/fdc/v1/food/${foodId}?api_key=${process.env.USDA_API_KEY}`
+          `https://api.nal.usda.gov/fdc/v1/food/${foodId}?api_key=${process.env.USDA_API_KEY}`
       );
-  
-      // Log the food response
-      console.log('Food response:', foodResponse.data);
-  
+
       const nutrients = foodResponse.data.foodNutrients;
-  
-      // Extract macronutrients and calories
+
+      // Extract macronutrients and calories, then adjust based on servings
       const macros = {
-        item: foodResponse.data.description,
-        carbohydrates: nutrients.find(nutrient => nutrient.nutrient.name === 'Carbohydrate, by difference')?.amount || 0,
-        fats: nutrients.find(nutrient => nutrient.nutrient.name === 'Total lipid (fat)')?.amount || 0,
-        proteins: nutrients.find(nutrient => nutrient.nutrient.name === 'Protein')?.amount || 0,
-        calories: nutrients.find(nutrient => nutrient.nutrient.name === 'Energy')?.amount || 0,
+          item: foodResponse.data.description,
+          carbohydrates: (nutrients.find(nutrient => nutrient.nutrient.name === 'Carbohydrate, by difference')?.amount || 0) * servings,
+          fats: (nutrients.find(nutrient => nutrient.nutrient.name === 'Total lipid (fat)')?.amount || 0) * servings,
+          proteins: (nutrients.find(nutrient => nutrient.nutrient.name === 'Protein')?.amount || 0) * servings,
+          calories: (nutrients.find(nutrient => nutrient.nutrient.name === 'Energy')?.amount || 0) * servings,
       };
-  
+
       res.json(macros);
-    } catch (error) {
-      // Log the error
+  } catch (error) {
       console.error('Error occurred:', error);
-  
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        console.error('Response data:', error.response.data);
-        console.error('Response status:', error.response.status);
-        console.error('Response headers:', error.response.headers);
-      } else if (error.request) {
-        // The request was made but no response was received
-        console.error('Request data:', error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        console.error('Error message:', error.message);
-      }
-  
       res.status(500).json({ error: 'An error occurred while fetching macro information' });
-    }
-  });
-  // Log a searched food item directly to the user's calorie log
-  router.post('/macros/log', async (req, res) => {
-    const { email, item, calories, protein, carbohydrates, fats, date } = req.body;
-  
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).send('User not found');
-        }
-  
-        const newlog = new CalorieData({
-            item, // Name of the food item
-            calories,
-            protein,
-            carbohydrates,
-            fats,
-            date, // Store the UTC date received from the frontend
-            user: user._id
-        });
-  
-        await newlog.save();
-        user.calories.push(newlog._id);
-        await user.save();
-  
-        res.status(201).send('Food item logged successfully');
-    } catch (error) {
-        res.status(400).send(error.message);
-    }
-  });
-  
+  }
+});
+
+// Log a searched food item directly to the user's calorie log
+router.post('/macros/log', async (req, res) => {
+  const { email, item, calories, protein, carbohydrates, fats, date, servings = 1 } = req.body;
+
+  try {
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).send('User not found');
+      }
+
+      // Adjust based on servings
+      const newlog = new CalorieData({
+          item,
+          calories: calories * servings,
+          protein: protein * servings,
+          carbohydrates: carbohydrates * servings,
+          fats: fats * servings,
+          date,
+          user: user._id
+      });
+
+      await newlog.save();
+      user.calories.push(newlog._id);
+      await user.save();
+
+      res.status(201).send('Food item logged successfully');
+  } catch (error) {
+      res.status(400).send(error.message);
+  }
+});
+
 
 router.get('/user/:email/remaining-calories', async (req, res) => {
   const { email } = req.params;
