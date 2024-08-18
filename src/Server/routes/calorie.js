@@ -13,48 +13,62 @@ dotenv.config({ path: envPath });
 // Log a new CalorieData
 
 
-
 router.post('/logcalories', async (req, res) => {
-    const { email, calories, protein, carbohydrates, fats } = req.body;
+  const { email, calories, protein, carbohydrates, fats, localDate } = req.body;
 
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).send('User not found');
-        }
+  try {
+      const user = await User.findOne({ email });
+      if (!user) {
+          return res.status(404).send('User not found');
+      }
 
-        const newlog = new CalorieData({
-            calories,
-            protein,
-            carbohydrates,
-            fats,
-            user: user._id
-        });
-        
-        await newlog.save();
-        user.calories.push(newlog._id);
-        await user.save();
+      // No need to convert localDate again; it's already in UTC
+      const newlog = new CalorieData({
+          calories,
+          protein,
+          carbohydrates,
+          fats,
+          date: localDate, // Store the adjusted UTC date directly
+          user: user._id
+      });
 
-        res.status(201).send('Calories logged');
-    } catch (error) {
-        res.status(400).send(error.message);
-    }
+      await newlog.save();
+      user.calories.push(newlog._id);
+      await user.save();
+
+      res.status(201).send('Calories logged');
+  } catch (error) {
+      res.status(400).send(error.message);
+  }
 });
+
 
 router.get('/user/:email/calories', async (req, res) => {
-    const { email } = req.params;
+  const { email } = req.params;
 
-    try {
-        const user = await User.findOne({ email }).populate('calories');
-        if (!user) {
-            return res.status(404).send('User not found');
-        }
+  try {
+      const user = await User.findOne({ email }).populate('calories');
+      if (!user) {
+          return res.status(404).send('User not found');
+      }
 
-        res.status(200).json(user.calories);
-    } catch (error) {
-        res.status(400).send(error.message);
-    }
+      // Adjust the dates to the local time zone before sending them to the client
+      const adjustedCalories = user.calories.map(log => {
+          const utcDate = new Date(log.date);
+          // Convert UTC date to local date
+          const localDate = new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate());
+          return {
+              ...log._doc, // Spread the original log object
+              date: localDate, // Replace the date with the adjusted local date
+          };
+      });
+
+      res.status(200).json(adjustedCalories);
+  } catch (error) {
+      res.status(400).send(error.message);
+  }
 });
+
 router.delete('/logcalories/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -153,33 +167,35 @@ router.get('/macros', async (req, res) => {
     }
   });
   // Log a searched food item directly to the user's calorie log
-router.post('/macros/log', async (req, res) => {
-  const { email, item, calories, protein, carbohydrates, fats } = req.body;
-
-  try {
-      const user = await User.findOne({ email });
-      if (!user) {
-          return res.status(404).send('User not found');
-      }
-
-      const newlog = new CalorieData({
-          item, // Name of the food item
-          calories,
-          protein,
-          carbohydrates,
-          fats,
-          user: user._id
-      });
-
-      await newlog.save();
-      user.calories.push(newlog._id);
-      await user.save();
-
-      res.status(201).send('Food item logged successfully');
-  } catch (error) {
-      res.status(400).send(error.message);
-  }
-});
+  router.post('/macros/log', async (req, res) => {
+    const { email, item, calories, protein, carbohydrates, fats, date } = req.body;
+  
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+  
+        const newlog = new CalorieData({
+            item, // Name of the food item
+            calories,
+            protein,
+            carbohydrates,
+            fats,
+            date, // Store the UTC date received from the frontend
+            user: user._id
+        });
+  
+        await newlog.save();
+        user.calories.push(newlog._id);
+        await user.save();
+  
+        res.status(201).send('Food item logged successfully');
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+  });
+  
 
 router.get('/user/:email/remaining-calories', async (req, res) => {
   const { email } = req.params;
