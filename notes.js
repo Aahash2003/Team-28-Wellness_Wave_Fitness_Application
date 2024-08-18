@@ -7,7 +7,8 @@
 // The user needs a profile page -- User's Name, age, weight, gender, height, activity level ✅
 // Counting the macros from each data entry ✅
 // Effects the macro calories for that day, have the user select the current calories from the calorie calculator (Button), these calories will then be deducted based on the calorie log ✅
+// Update the food search to allow user to change based on the number of servings or grams ✅
 // Ask for tips about how you want to change the website
 // AI might be a cool feature
-// Update the food search to allow user to change based on the number of servings or grams 
 // Lets Develop an Organized Workout List based on the Muscle Group, possibly an icon for each muscle, which the user selects
+// 
