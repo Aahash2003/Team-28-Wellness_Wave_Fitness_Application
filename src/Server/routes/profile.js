@@ -46,6 +46,7 @@ router.post('/', async (req, res) => {
 });
 
 // Route to get user profile by email
+
 router.get('/:email', async (req, res) => {
     try {
         const { email } = req.params;

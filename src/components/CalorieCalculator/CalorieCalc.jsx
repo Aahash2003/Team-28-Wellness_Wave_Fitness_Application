@@ -138,7 +138,7 @@ const CalorieCalc = () => {
   return (
     <Box maxW="md" mx="auto" mt={10} p={5} borderWidth="1px" borderRadius="lg">
       <Heading as="h1" size="lg" mb={6}>
-        Daily Calorie Calculator
+        Daily Caloric Calculator
       </Heading>
       {error && (
         <Alert status="error" mb={4}>

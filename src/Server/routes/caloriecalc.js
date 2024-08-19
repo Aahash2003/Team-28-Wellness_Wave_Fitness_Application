@@ -84,56 +84,60 @@ router.get('/calculate/:email', async (req, res) => {
     }
 });
 
-// Route to calculate daily calories based on goal by email
 router.get('/calculate-DC/:email', async (req, res) => {
     try {
         const { email } = req.params;
         const { targetWeight, startDate, endDate } = req.query;
 
+        console.log(`Received query params - targetWeight: ${targetWeight}, startDate: ${startDate}, endDate: ${endDate}`);
+
         if (!targetWeight || !startDate || !endDate) {
+            console.log('Missing query parameters');
             return res.status(400).json({ msg: 'Please provide target weight, start date, and end date.' });
         }
 
         const profile = await Profile.findOne({ email });
         if (!profile) {
+            console.log('Profile not found');
             return res.status(404).json({ msg: 'User profile not found. Please create your profile first.' });
         }
 
-        // Calculate age based on DOB
         const calculateAge = (DOB) => {
             return dayjs().diff(dayjs(DOB), 'year');
         };
 
         const age = calculateAge(profile.DOB);
         
-        // Log the values for debugging
         console.log(`Calculating TDEE for: age=${age}, gender=${profile.Gender}, height=${profile.Height}, weight=${profile.CurrentWeight}, activityLevel=${profile.ActivityLevel}`);
         
         const calorie_Maintenance = calculateTDEE(age, profile.Gender, profile.Height, profile.CurrentWeight, profile.ActivityLevel);
         
         console.log(`TDEE calculated: ${calorie_Maintenance}`);
         
-        // Parse startDate and endDate using dayjs
         const parsedStartDate = dayjs(startDate, ['YYYY-MM-DD', 'MM/DD/YYYY']);
         const parsedEndDate = dayjs(endDate, ['YYYY-MM-DD', 'MM/DD/YYYY']);
+
+        console.log(`Parsed Dates - Start: ${parsedStartDate.format()}, End: ${parsedEndDate.format()}`);
 
         const durationInDays = parsedEndDate.diff(parsedStartDate, 'day');
 
         if (durationInDays <= 0) {
+            console.log('End date is before start date');
             return res.status(400).json({ msg: 'End date must be after start date.' });
         }
         
-        console.log("Days" + durationInDays);
+        console.log("Duration in Days: " + durationInDays);
         const dailyCalories = calculateDailyCalories(calorie_Maintenance, parseFloat(targetWeight), profile.CurrentWeight, durationInDays);
         
         console.log(`Daily Calories calculated: ${dailyCalories}`);
         
         res.json({ dailyCalories, calorie_Maintenance });
     } catch (err) {
-        console.error(err);
+        console.error('Server Error:', err);
         res.status(500).send('Server Error');
     }
 });
+
 
 router.post('/store-caloric-value', async (req, res) => {
     try {

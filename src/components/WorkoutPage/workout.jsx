@@ -3,7 +3,6 @@ import axios from 'axios';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import CreateCategory from './CreateCategory';
-import CreateWorkoutPlan from './CreateWorkoutPlan';
 import './Workout.css'; // Import the CSS file for styling
 
 const WorkoutLogger = () => {
@@ -12,7 +11,6 @@ const WorkoutLogger = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [workoutsByCategory, setWorkoutsByCategory] = useState([]);
-  const [workoutName, setWorkoutName] = useState('');
   const [exercises, setExercises] = useState([
     { name: '', sets: '', reps: '', weight: '', restTime: '', currentRepMax: '', oneRepMax: '' }
   ]);
@@ -20,7 +18,6 @@ const WorkoutLogger = () => {
   const [date, setDate] = useState(new Date());
 
   useEffect(() => {
-    console.log('Email from local storage:', email); // Debug log
     fetchCategories();
   }, [email]);
 
@@ -101,8 +98,8 @@ const WorkoutLogger = () => {
   };
 
   const handleLogWorkout = async () => {
-    if (!workoutName.trim()) {
-        alert('Please enter a workout name.');
+    if (!selectedCategory) {
+        alert('Please select a workout category.');
         return;
     }
 
@@ -112,27 +109,24 @@ const WorkoutLogger = () => {
     }
 
     try {
-        // Log the data being sent to the backend for debugging
         console.log("Logging Workout:", {
-            workoutName,
             exercises,
             email,
             date: date.toISOString(),
-            category: selectedCategory,
+            categoryId: selectedCategory,
         });
 
         const response = await axios.post('http://localhost:8080/api/workout/logWorkout', {
-            workoutName: workoutName.trim(), // Ensure there is no extra whitespace
             exercises,
             email,
             date: date.toISOString(),  // Ensure the date is properly formatted
-            category: selectedCategory,
+            categoryId: selectedCategory,
         });
         alert('Workout logged successfully');
         fetchWorkouts();
     } catch (error) {
-        console.error("Error logging workout:", error.response.data);  // Log the error response
-        alert('Error logging workout: ' + (error.response.data.message || error.message));
+        console.error("Error logging workout:", error.response?.data || error.message);  // Log the error response
+        alert('Error logging workout: ' + (error.response?.data.message || error.message));
     }
   };
 
@@ -151,7 +145,6 @@ const WorkoutLogger = () => {
       <h2>{date.toDateString()}</h2>
       <Calendar onChange={onDateChange} value={date} />
       <CreateCategory onCategoryCreated={fetchCategories} />
-      <CreateWorkoutPlan categories={categories} onPlanCreated={fetchCategories} />
       <select value={selectedCategory} onChange={(e) => handleCategoryChange(e.target.value)}>
         <option value="">Select Category</option>
         {categories.map(category => (
@@ -167,7 +160,6 @@ const WorkoutLogger = () => {
           <ul>
             {workoutsByCategory.map((workout) => (
               <li key={workout._id}>
-                <strong>{workout.workoutName}</strong>
                 <ul>
                   {workout.exercises.map((exercise, index) => (
                     <li key={index}>
@@ -180,13 +172,6 @@ const WorkoutLogger = () => {
           </ul>
         </div>
       )}
-
-      <input
-        type="text"
-        placeholder="Workout Name"
-        value={workoutName}
-        onChange={(e) => setWorkoutName(e.target.value)}
-      />
 
       <h3>Exercises</h3>
       {exercises.map((exercise, index) => (
@@ -241,19 +226,15 @@ const WorkoutLogger = () => {
           )}
         </div>
       ))}
-      
 
       <button onClick={handleLogWorkout}>Log Workout</button>
-      <h2></h2>
       <button onClick={handleAddExercise}>Add Exercise</button>
-      
 
       <h2>Your Workouts for {date.toDateString()}</h2>
       {filteredWorkouts.length > 0 ? (
         <ul className="workout-list">
           {filteredWorkouts.map((workout) => (
             <li key={workout._id}>
-              <strong>{workout.workoutName}</strong>
               <ul>
                 {workout.exercises.map((exercise, index) => (
                   <li key={index}>

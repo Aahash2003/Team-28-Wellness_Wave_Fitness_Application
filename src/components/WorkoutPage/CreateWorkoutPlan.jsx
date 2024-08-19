@@ -1,3 +1,4 @@
+/*
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -65,3 +66,4 @@ const CreateWorkoutPlan = ({ categories, onPlanCreated }) => {
 };
 
 export default CreateWorkoutPlan;
+*/
