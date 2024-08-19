@@ -32,19 +32,24 @@ const WorkoutLogger = () => {
   };
 
   useEffect(() => {
-    if (email) {
+    if (email && date) {
       fetchWorkouts();
     }
-  }, [email]);
+  }, [email, date]);
 
-  const fetchWorkouts = async () => {
+const fetchWorkouts = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/workout/user/${email}/workouts`);
-      setWorkouts(response.data);
+        const response = await axios.get(`http://localhost:8080/api/workout/user/${email}/workouts`, {
+            params: {
+                date: date.toISOString().split('T')[0] // Format the date as YYYY-MM-DD
+            }
+        });
+        setWorkouts(response.data);
     } catch (error) {
-      alert('Error fetching workouts: ' + error.message);
+        alert('Error fetching workouts: ' + error.message);
     }
-  };
+};
+
   const fetchWorkoutsByCategory = async (categoryId) => {
     try {
       const response = await axios.get(`http://localhost:8080/api/workout/category/${categoryId}/workouts`);
@@ -153,6 +158,7 @@ const handleCategoryChange = (categoryId) => {
 
   const onDateChange = (newDate) => {
     setDate(newDate);
+    fetchWorkouts();
 };
 
 const filteredWorkouts = workoutsByCategory.filter(workout => {
@@ -254,25 +260,34 @@ return (
     <button onClick={handleLogWorkout}>{selectedWorkout ? 'Update Workout' : 'Log Workout'}</button>
 
     <h2>Your Workouts for {date.toDateString()}</h2>
-    {filteredWorkouts.length > 0 ? (
+    {workouts.length > 0 ? (
       <ul className="workout-list">
-        {filteredWorkouts.map((workout) => (
-          <li key={workout._id}>
-            <ul>
-              {workout.exercises.map((exercise, index) => (
-                <li key={index}>
-                  {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
+        {workouts.map((workout) => {
+          const workoutDate = new Date(workout.date).toDateString();
+          const selectedDate = date.toDateString();
+          if (workoutDate === selectedDate) {
+            return (
+              <li key={workout._id}>
+                <ul>
+                  {workout.exercises.map((exercise, index) => (
+                    <li key={index}>
+                      {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            );
+          } else {
+            return null;
+          }
+        })}
       </ul>
     ) : (
       <p>No workouts logged for this date.</p>
     )}
   </div>
 );
+
 
 };
 

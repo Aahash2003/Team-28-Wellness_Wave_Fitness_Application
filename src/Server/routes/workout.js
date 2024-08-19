@@ -61,12 +61,22 @@ router.post('/logWorkout', async (req, res) => {
 });
 
 
-// Get all workouts for a specific user
+// Get all workouts for a specific user on a specific date
 router.get('/user/:email/workouts', async (req, res) => {
     const { email } = req.params;
+    const { date } = req.query;
 
     try {
-        const user = await User.findOne({ email }).populate('workouts');
+        const user = await User.findOne({ email }).populate({
+            path: 'workouts',
+            match: {
+                date: {
+                    $gte: new Date(new Date(date).setHours(0, 0, 0, 0)), // Start of the day
+                    $lte: new Date(new Date(date).setHours(23, 59, 59, 999)) // End of the day
+                }
+            }
+        });
+
         if (!user) {
             return res.status(404).send('User not found');
         }
