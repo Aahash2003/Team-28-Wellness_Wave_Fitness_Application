@@ -37,18 +37,27 @@ const WorkoutLogger = () => {
     }
   }, [email, date]);
 
-const fetchWorkouts = async () => {
+  const fetchWorkouts = async () => {
     try {
+        // Send the UTC date string (YYYY-MM-DD)
+        const utcDate = date.toISOString().split('T')[0];
+
         const response = await axios.get(`http://localhost:8080/api/workout/user/${email}/workouts`, {
             params: {
-                date: date.toISOString().split('T')[0] // Format the date as YYYY-MM-DD
+                date: utcDate // Send the UTC date
             }
         });
+
+        // Set the workouts directly
         setWorkouts(response.data);
+        console.log(response.data)
     } catch (error) {
         alert('Error fetching workouts: ' + error.message);
     }
 };
+
+
+
 
   const fetchWorkoutsByCategory = async (categoryId) => {
     try {
@@ -265,6 +274,8 @@ return (
         {workouts.map((workout) => {
           const workoutDate = new Date(workout.date).toDateString();
           const selectedDate = date.toDateString();
+
+          // Direct comparison of the date strings
           if (workoutDate === selectedDate) {
             return (
               <li key={workout._id}>
@@ -287,6 +298,8 @@ return (
     )}
   </div>
 );
+
+
 
 
 };

@@ -9,7 +9,6 @@ const exerciseSchema = new mongoose.Schema({
     weight: { type: Number, required: true },
     restTime: { type: Number, required: true },
     currentRepMax: { type: Number, default: false },
-    date: { type: Date, default: Date.now, required: true }
 
 });
 
