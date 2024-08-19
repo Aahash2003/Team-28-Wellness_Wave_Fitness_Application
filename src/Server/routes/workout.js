@@ -61,18 +61,24 @@ router.post('/logWorkout', async (req, res) => {
 });
 
 
-// Get all workouts for a specific user on a specific date
 router.get('/user/:email/workouts', async (req, res) => {
     const { email } = req.params;
     const { date } = req.query;
 
     try {
+        // Convert the provided date to the start and end of the day in UTC
+        const startOfDayUTC = new Date(date);
+        startOfDayUTC.setUTCHours(0, 0, 0, 0);  // Start of UTC day
+        
+        const endOfDayUTC = new Date(date);
+        endOfDayUTC.setUTCHours(23, 59, 59, 999);  // End of UTC day
+
         const user = await User.findOne({ email }).populate({
             path: 'workouts',
             match: {
                 date: {
-                    $gte: new Date(new Date(date).setHours(0, 0, 0, 0)), // Start of the day
-                    $lte: new Date(new Date(date).setHours(23, 59, 59, 999)) // End of the day
+                    $gte: startOfDayUTC,
+                    $lte: endOfDayUTC
                 }
             }
         });
@@ -86,6 +92,9 @@ router.get('/user/:email/workouts', async (req, res) => {
         res.status(400).send(error.message);
     }
 });
+
+
+
 
 router.post('/createCategory', async (req, res) => {
     const { name, description } = req.body;
