@@ -272,10 +272,10 @@ return (
     {workouts.length > 0 ? (
       <ul className="workout-list">
         {workouts.map((workout) => {
-          const workoutDate = new Date(workout.date).toDateString();
-          const selectedDate = date.toDateString();
+          // Convert the workout date to local time and compare
+          const workoutDate = new Date(workout.date).toLocaleDateString();
+          const selectedDate = date.toLocaleDateString();
 
-          // Direct comparison of the date strings
           if (workoutDate === selectedDate) {
             return (
               <li key={workout._id}>
