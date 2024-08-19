@@ -11,6 +11,7 @@ const WorkoutLogger = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [workoutsByCategory, setWorkoutsByCategory] = useState([]);
+  const [selectedWorkout, setSelectedWorkout] = useState(null); // New state for selected workout
   const [exercises, setExercises] = useState([
     { name: '', sets: '', reps: '', weight: '', restTime: '', currentRepMax: '', oneRepMax: '' }
   ]);
@@ -48,7 +49,17 @@ const WorkoutLogger = () => {
   const fetchWorkoutsByCategory = async (categoryId) => {
     try {
       const response = await axios.get(`http://localhost:8080/api/workout/category/${categoryId}/workouts`);
-      setWorkoutsByCategory(response.data);
+      
+      // Filter out duplicate workouts by comparing exercise names
+      const uniqueWorkouts = response.data.reduce((acc, workout) => {
+        const existingWorkout = acc.find(w => w.exercises.map(e => e.name).sort().join(', ') === workout.exercises.map(e => e.name).sort().join(', '));
+        if (!existingWorkout) {
+          acc.push(workout);
+        }
+        return acc;
+      }, []);
+
+      setWorkoutsByCategory(uniqueWorkouts);
     } catch (error) {
       alert('Error fetching workouts by category: ' + error.message);
     }
@@ -56,6 +67,7 @@ const WorkoutLogger = () => {
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
+    setSelectedWorkout(null); // Reset selected workout
     if (categoryId) {
       fetchWorkoutsByCategory(categoryId);
     } else {
@@ -63,9 +75,18 @@ const WorkoutLogger = () => {
     }
   };
 
-  const handleAddExercise = () => {
+  const handleWorkoutSelect = (workoutId) => {
+    const workout = workoutsByCategory.find(w => w._id === workoutId);
+    setSelectedWorkout(workout);
+    if (workout) {
+      setExercises(workout.exercises); // Populate form with existing workout data
+    }
+  };
+
+ /* const handleAddExercise = () => {
     setExercises([...exercises, { name: '', sets: '', reps: '', weight: '', restTime: '', currentRepMax: '', oneRepMax: '' }]);
   };
+  */
 
   const handleRemoveExercise = (index) => {
     const newExercises = exercises.filter((_, i) => i !== index);
@@ -109,23 +130,22 @@ const WorkoutLogger = () => {
     }
 
     try {
-        console.log("Logging Workout:", {
+        const payload = {
             exercises,
             email,
             date: date.toISOString(),
             categoryId: selectedCategory,
-        });
+        };
 
-        const response = await axios.post('http://localhost:8080/api/workout/logWorkout', {
-            exercises,
-            email,
-            date: date.toISOString(),  // Ensure the date is properly formatted
-            categoryId: selectedCategory,
-        });
+        if (selectedWorkout) {
+            payload.workoutId = selectedWorkout._id; // Pass the workoutId if editing an existing workout
+        }
+
+        const response = await axios.post('http://localhost:8080/api/workout/logWorkout', payload);
         alert('Workout logged successfully');
         fetchWorkouts();
     } catch (error) {
-        console.error("Error logging workout:", error.response?.data || error.message);  // Log the error response
+        console.error("Error logging workout:", error.response?.data || error.message);
         alert('Error logging workout: ' + (error.response?.data.message || error.message));
     }
   };
@@ -156,20 +176,15 @@ const WorkoutLogger = () => {
 
       {workoutsByCategory.length > 0 && (
         <div>
-          <h3>Exercises in Selected Category</h3>
-          <ul>
+          <h3>Select a Workout</h3>
+          <select onChange={(e) => handleWorkoutSelect(e.target.value)} value={selectedWorkout?._id || ''}>
+            <option value="">Select Workout</option>
             {workoutsByCategory.map((workout) => (
-              <li key={workout._id}>
-                <ul>
-                  {workout.exercises.map((exercise, index) => (
-                    <li key={index}>
-                      {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
-                    </li>
-                  ))}
-                </ul>
-              </li>
+              <option key={workout._id} value={workout._id}>
+                {workout.exercises.map((exercise) => exercise.name).join(', ')}
+              </option>
             ))}
-          </ul>
+          </select>
         </div>
       )}
 
@@ -227,8 +242,8 @@ const WorkoutLogger = () => {
         </div>
       ))}
 
-      <button onClick={handleLogWorkout}>Log Workout</button>
-      <button onClick={handleAddExercise}>Add Exercise</button>
+      <button onClick={handleLogWorkout}>{selectedWorkout ? 'Update Workout' : 'Log Workout'}</button>
+
 
       <h2>Your Workouts for {date.toDateString()}</h2>
       {filteredWorkouts.length > 0 ? (
