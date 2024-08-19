@@ -45,11 +45,11 @@ const WorkoutLogger = () => {
       alert('Error fetching workouts: ' + error.message);
     }
   };
-
   const fetchWorkoutsByCategory = async (categoryId) => {
     try {
       const response = await axios.get(`http://localhost:8080/api/workout/category/${categoryId}/workouts`);
-      
+      setWorkoutsByCategory(response.data);
+
       // Filter out duplicate workouts by comparing exercise names
       const uniqueWorkouts = response.data.reduce((acc, workout) => {
         const existingWorkout = acc.find(w => w.exercises.map(e => e.name).sort().join(', ') === workout.exercises.map(e => e.name).sort().join(', '));
@@ -65,15 +65,16 @@ const WorkoutLogger = () => {
     }
   };
 
-  const handleCategoryChange = (categoryId) => {
-    setSelectedCategory(categoryId);
-    setSelectedWorkout(null); // Reset selected workout
-    if (categoryId) {
-      fetchWorkoutsByCategory(categoryId);
-    } else {
+const handleCategoryChange = (categoryId) => {
+  setSelectedCategory(categoryId);
+  setSelectedWorkout(null); // Reset selected workout
+  if (categoryId) {
+      fetchWorkoutsByCategory(categoryId); // Fetch all workouts for the selected category
+  } else {
       setWorkoutsByCategory([]);
-    }
-  };
+  }
+};
+
 
   const handleWorkoutSelect = (workoutId) => {
     const workout = workoutsByCategory.find(w => w._id === workoutId);
@@ -150,106 +151,39 @@ const WorkoutLogger = () => {
     }
   };
 
-  const onDateChange = (date) => {
-    setDate(date);
-  };
+  const onDateChange = (newDate) => {
+    setDate(newDate);
+};
 
-  const filteredWorkouts = workouts.filter(workout => {
+const filteredWorkouts = workoutsByCategory.filter(workout => {
     const workoutDate = new Date(workout.date).toDateString();
     const selectedDate = date.toDateString();
     return workoutDate === selectedDate;
-  });
+});
 
-  return (
-    <div className="container">
-      <h2>{date.toDateString()}</h2>
-      <Calendar onChange={onDateChange} value={date} />
-      <CreateCategory onCategoryCreated={fetchCategories} />
-      <select value={selectedCategory} onChange={(e) => handleCategoryChange(e.target.value)}>
-        <option value="">Select Category</option>
-        {categories.map(category => (
-          <option key={category._id} value={category._id}>
-            {category.name}
-          </option>
-        ))}
-      </select>
 
-      {workoutsByCategory.length > 0 && (
-        <div>
-          <h3>Select a Workout</h3>
-          <select onChange={(e) => handleWorkoutSelect(e.target.value)} value={selectedWorkout?._id || ''}>
-            <option value="">Select Workout</option>
-            {workoutsByCategory.map((workout) => (
-              <option key={workout._id} value={workout._id}>
-                {workout.exercises.map((exercise) => exercise.name).join(', ')}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      <h3>Exercises</h3>
-      {exercises.map((exercise, index) => (
-        <div key={index} className="exercise-container">
-          <input
-            type="text"
-            placeholder="Exercise Name"
-            value={exercise.name}
-            onChange={(e) => handleExerciseChange(index, 'name', e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Sets"
-            value={exercise.sets}
-            onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Reps"
-            value={exercise.reps}
-            onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Weight"
-            value={exercise.weight}
-            onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Rest Time"
-            value={exercise.restTime}
-            onChange={(e) => handleExerciseChange(index, 'restTime', e.target.value)}
-          />
-          <input
-            type="number"
-            placeholder="Current Rep Max"
-            value={exercise.currentRepMax}
-            onChange={(e) => handleExerciseChange(index, 'currentRepMax', e.target.value)}
-          />
-          <div className="one-rep-max-container">
-            <input
-              type="text"
-              placeholder="One Rep Max"
-              value={exercise.oneRepMax}
-              readOnly
-            />
-            <span className="one-rep-max-label">LBS</span>
-          </div>
-          {exercises.length > 1 && (
-            <button onClick={() => handleRemoveExercise(index)}>Remove Exercise</button>
-          )}
-        </div>
+return (
+  <div className="container">
+    <h2>{date.toDateString()}</h2>
+    <Calendar onChange={onDateChange} value={date} />
+    <CreateCategory onCategoryCreated={fetchCategories} />
+    <select value={selectedCategory} onChange={(e) => handleCategoryChange(e.target.value)}>
+      <option value="">Select Category</option>
+      {categories.map(category => (
+        <option key={category._id} value={category._id}>
+          {category.name}
+        </option>
       ))}
+    </select>
 
-      <button onClick={handleLogWorkout}>{selectedWorkout ? 'Update Workout' : 'Log Workout'}</button>
-
-
-      <h2>Your Workouts for {date.toDateString()}</h2>
-      {filteredWorkouts.length > 0 ? (
+    {workoutsByCategory.length > 0 && (
+      <div>
+        <h3>Workouts in Selected Category</h3>
         <ul className="workout-list">
-          {filteredWorkouts.map((workout) => (
+          {workoutsByCategory.map((workout) => (
             <li key={workout._id}>
+              <strong>{workout.exercises.map(e => e.name).join(', ')}</strong>
+              <button onClick={() => handleWorkoutSelect(workout._id)}>Edit Workout</button>
               <ul>
                 {workout.exercises.map((exercise, index) => (
                   <li key={index}>
@@ -260,11 +194,86 @@ const WorkoutLogger = () => {
             </li>
           ))}
         </ul>
-      ) : (
-        <p>No workouts logged for this date.</p>
-      )}
-    </div>
-  );
+      </div>
+    )}
+
+    <h3>Exercises</h3>
+    {exercises.map((exercise, index) => (
+      <div key={index} className="exercise-container">
+        <input
+          type="text"
+          placeholder="Exercise Name"
+          value={exercise.name}
+          onChange={(e) => handleExerciseChange(index, 'name', e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Sets"
+          value={exercise.sets}
+          onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Reps"
+          value={exercise.reps}
+          onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Weight"
+          value={exercise.weight}
+          onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Rest Time"
+          value={exercise.restTime}
+          onChange={(e) => handleExerciseChange(index, 'restTime', e.target.value)}
+        />
+        <input
+          type="number"
+          placeholder="Current Rep Max"
+          value={exercise.currentRepMax}
+          onChange={(e) => handleExerciseChange(index, 'currentRepMax', e.target.value)}
+        />
+        <div className="one-rep-max-container">
+          <input
+            type="text"
+            placeholder="One Rep Max"
+            value={exercise.oneRepMax}
+            readOnly
+          />
+          <span className="one-rep-max-label">LBS</span>
+        </div>
+        {exercises.length > 1 && (
+          <button onClick={() => handleRemoveExercise(index)}>Remove Exercise</button>
+        )}
+      </div>
+    ))}
+
+    <button onClick={handleLogWorkout}>{selectedWorkout ? 'Update Workout' : 'Log Workout'}</button>
+
+    <h2>Your Workouts for {date.toDateString()}</h2>
+    {filteredWorkouts.length > 0 ? (
+      <ul className="workout-list">
+        {filteredWorkouts.map((workout) => (
+          <li key={workout._id}>
+            <ul>
+              {workout.exercises.map((exercise, index) => (
+                <li key={index}>
+                  {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No workouts logged for this date.</p>
+    )}
+  </div>
+);
+
 };
 
 export default WorkoutLogger;
