@@ -5,7 +5,7 @@ const { Workout, WorkoutLog, WorkoutCategory, UserWorkoutPlan } = require('../mo
 const router = express.Router();
 
 router.post('/logWorkout', async (req, res) => {
-    const { email, exercises, categoryId } = req.body;
+    const { email, exercises, categoryId, workoutId } = req.body;
 
     try {
         const user = await User.findOne({ email });
@@ -13,34 +13,52 @@ router.post('/logWorkout', async (req, res) => {
             return res.status(404).send('User not found');
         }
 
+        // Find the category to ensure it exists
         const category = await WorkoutCategory.findById(categoryId);
         if (!category) {
             return res.status(404).send('Category not found');
         }
 
-        // Create a new workout instance with the category
-        const newWorkout = new Workout({
-            exercises, // Array of exercise objects
-            user: user._id,
-            category: category._id
-        });
-        
-        await newWorkout.save();
+        let workout;
+        if (workoutId) {
+            // Update existing workout
+            workout = await Workout.findById(workoutId);
+            if (workout) {
+                workout.exercises = exercises;
+                workout.date = Date.now(); // Update the date to the current time
+            } else {
+                return res.status(404).send('Workout not found');
+            }
+        } else {
+            // Check if a workout with the same exercises already exists in the category
+            workout = await Workout.findOne({ user: user._id, category: categoryId, exercises });
 
-        // Add the workout to the category's workouts array
-        category.workouts.push(newWorkout._id);
+            if (!workout) {
+                // Create a new workout if no existing workout matches
+                workout = new Workout({
+                    exercises,
+                    user: user._id,
+                    category: category._id
+                });
+
+                // Add the new workout to the category
+                category.workouts.push(workout._id);
+            } else {
+                // Update the existing workout's date
+                workout.date = Date.now(); // Update the date to the current time
+            }
+        }
+
+        await workout.save();
         await category.save();
-
-        // Assuming the User model has a workouts field to store workout references
-        user.workouts.push(newWorkout._id);
+        user.workouts.push(workout._id);
         await user.save();
 
-        res.status(201).send('Workout logged');
+        res.status(201).send('Workout logged successfully');
     } catch (error) {
         res.status(400).send(error.message);
     }
 });
-
 
 
 // Get all workouts for a specific user
