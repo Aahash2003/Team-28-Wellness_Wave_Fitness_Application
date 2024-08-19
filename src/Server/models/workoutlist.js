@@ -1,3 +1,4 @@
+const { date } = require('joi');
 const mongoose = require('mongoose');
 
 // Define the Exercise schema for individual exercises in a workout
@@ -7,14 +8,17 @@ const exerciseSchema = new mongoose.Schema({
     reps: { type: Number, required: true },
     weight: { type: Number, required: true },
     restTime: { type: Number, required: true },
-    currentRepMax: { type: Number, default: false }
+    currentRepMax: { type: Number, default: false },
+    date: { type: Date, default: Date.now, required: true }
+
 });
 
 // Define the Workout schema, which can include multiple exercises
 const workoutSchema = new mongoose.Schema({
     exercises: [exerciseSchema], // Array of exercises
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    category: { type: mongoose.Schema.Types.ObjectId, ref: 'WorkoutCategory', required: true } // Reference to the category
+    category: { type: mongoose.Schema.Types.ObjectId, ref: 'WorkoutCategory', required: true }, // Reference to the category
+    date: { type: Date, default: Date.now, required: true }
 });
 
 // Define the WorkoutCategory schema to organize workouts
