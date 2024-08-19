@@ -4,9 +4,8 @@ const { Workout, WorkoutLog, WorkoutCategory, UserWorkoutPlan } = require('../mo
 
 const router = express.Router();
 
-// Log a new workout
 router.post('/logWorkout', async (req, res) => {
-    const { email, workoutName, exercises } = req.body;
+    const { email, exercises, categoryId } = req.body;
 
     try {
         const user = await User.findOne({ email });
@@ -14,14 +13,23 @@ router.post('/logWorkout', async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        // Create a new workout instance with the exercises array
+        const category = await WorkoutCategory.findById(categoryId);
+        if (!category) {
+            return res.status(404).send('Category not found');
+        }
+
+        // Create a new workout instance with the category
         const newWorkout = new Workout({
-            workoutName,
             exercises, // Array of exercise objects
-            user: user._id
+            user: user._id,
+            category: category._id
         });
         
         await newWorkout.save();
+
+        // Add the workout to the category's workouts array
+        category.workouts.push(newWorkout._id);
+        await category.save();
 
         // Assuming the User model has a workouts field to store workout references
         user.workouts.push(newWorkout._id);
@@ -32,6 +40,8 @@ router.post('/logWorkout', async (req, res) => {
         res.status(400).send(error.message);
     }
 });
+
+
 
 // Get all workouts for a specific user
 router.get('/user/:email/workouts', async (req, res) => {
@@ -49,7 +59,6 @@ router.get('/user/:email/workouts', async (req, res) => {
     }
 });
 
-// Create a new workout category
 router.post('/createCategory', async (req, res) => {
     const { name, description } = req.body;
 
@@ -62,7 +71,7 @@ router.post('/createCategory', async (req, res) => {
     }
 });
 
-// Create a new user workout plan
+/*// Create a new user workout plan
 router.post('/createWorkoutPlan', async (req, res) => {
     const { email, planName, description, category, workouts } = req.body;
 
@@ -87,7 +96,7 @@ router.post('/createWorkoutPlan', async (req, res) => {
         res.status(400).send(error.message);
     }
 });
-
+*/
 // Get all workout categories
 router.get('/workoutCategories', async (req, res) => {
     try {
@@ -98,7 +107,6 @@ router.get('/workoutCategories', async (req, res) => {
     }
 });
 
-// Get workouts by category
 router.get('/category/:categoryId/workouts', async (req, res) => {
     const { categoryId } = req.params;
 
