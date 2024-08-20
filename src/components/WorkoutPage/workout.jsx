@@ -143,12 +143,12 @@ const handleCategoryChange = (categoryId) => {
         alert('Please add at least one exercise with a valid name.');
         return;
     }
-
+console.log("Date: "+date.toISOString())
     try {
         const payload = {
             exercises,
             email,
-            date: date.toISOString(),
+            date: date.toISOString(),  // Send the selected date in ISO format
             categoryId: selectedCategory,
         };
 
@@ -158,12 +158,12 @@ const handleCategoryChange = (categoryId) => {
 
         const response = await axios.post('http://localhost:8080/api/workout/logWorkout', payload);
         alert('Workout logged successfully');
-        fetchWorkouts();
+        fetchWorkouts();  // Refresh the workouts list
     } catch (error) {
         console.error("Error logging workout:", error.response?.data || error.message);
         alert('Error logging workout: ' + (error.response?.data.message || error.message));
     }
-  };
+};
 
   const onDateChange = (newDate) => {
     setDate(newDate);
@@ -266,7 +266,12 @@ return (
       </div>
     ))}
 
-    <button onClick={handleLogWorkout}>{selectedWorkout ? 'Update Workout' : 'Log Workout'}</button>
+<button onClick={handleLogWorkout}>
+  {selectedWorkout ? 'Update Workout' : 'Log Workout'} for {date.toDateString()}
+</button>
+<h2>
+  
+</h2>
 
     <h2>Your Workouts for {date.toDateString()}</h2>
     {workouts.length > 0 ? (
@@ -298,7 +303,6 @@ return (
     )}
   </div>
 );
-
 
 
 
