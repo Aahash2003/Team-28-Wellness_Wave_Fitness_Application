@@ -11,4 +11,4 @@
 // Ask for tips about how you want to change the website
 // AI might be a cool feature
 // Lets Develop an Organized Workout List based on the Muscle Group, possibly an icon for each muscle, which the user selects
-// 
+// Allowed the Users to Select Based on Categories Instead, this allows them to create any split they would like
