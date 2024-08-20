@@ -5,7 +5,7 @@ const { Workout, WorkoutLog, WorkoutCategory, UserWorkoutPlan } = require('../mo
 const router = express.Router();
 
 router.post('/logWorkout', async (req, res) => {
-    const { email, exercises, categoryId, workoutId } = req.body;
+    const { email, exercises, categoryId, workoutId, date } = req.body;
 
     try {
         const user = await User.findOne({ email });
@@ -20,32 +20,39 @@ router.post('/logWorkout', async (req, res) => {
         }
 
         let workout;
+
         if (workoutId) {
-            // Update existing workout
+            // Update existing workout if workoutId is provided
             workout = await Workout.findById(workoutId);
             if (workout) {
                 workout.exercises = exercises;
-                workout.date = Date.now(); // Update the date to the current time
+                workout.date = date ? new Date(date) : workout.date; // Update the date only if a new date is provided
             } else {
                 return res.status(404).send('Workout not found');
             }
         } else {
-            // Check if a workout with the same exercises already exists in the category
-            workout = await Workout.findOne({ user: user._id, category: categoryId, exercises });
+            // Look for a workout with the same exercises and date within the same category
+            workout = await Workout.findOne({ 
+                user: user._id, 
+                category: categoryId, 
+                date: new Date(date).toISOString(), // Ensure the date matches the specific date 
+                'exercises.name': { $in: exercises.map(e => e.name) } 
+            });
 
             if (!workout) {
-                // Create a new workout if no existing workout matches
+                // Create a new workout if no existing workout matches both date and exercises
                 workout = new Workout({
                     exercises,
                     user: user._id,
-                    category: category._id
+                    category: category._id,
+                    date: new Date(date).toISOString() // Store the date correctly
                 });
 
                 // Add the new workout to the category
                 category.workouts.push(workout._id);
             } else {
-                // Update the existing workout's date
-                workout.date = Date.now(); // Update the date to the current time
+                // If a workout with the same exercises exists on the same date, update it
+                workout.exercises = exercises;
             }
         }
 
