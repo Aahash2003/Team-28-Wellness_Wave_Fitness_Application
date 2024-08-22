@@ -3,6 +3,7 @@ import axios from 'axios';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import CreateCategory from './CreateCategory';
+import CategoryCard from './CategoryCard';
 import './Workout.css'; // Import the CSS file for styling
 
 const WorkoutLogger = () => {
@@ -79,15 +80,16 @@ const WorkoutLogger = () => {
     }
   };
 
-const handleCategoryChange = (categoryId) => {
-  setSelectedCategory(categoryId);
-  setSelectedWorkout(null); // Reset selected workout
-  if (categoryId) {
-      fetchWorkoutsByCategory(categoryId); // Fetch all workouts for the selected category
-  } else {
-      setWorkoutsByCategory([]);
-  }
+  const handleCategoryChange = (categoryId) => {
+    setSelectedCategory(categoryId);
+    setSelectedWorkout(null); // Reset selected workout
+    if (categoryId) {
+        fetchWorkoutsByCategory(categoryId); // Fetch workouts for the selected category
+    } else {
+        setWorkoutsByCategory([]); // Clear workouts if no category is selected
+    }
 };
+
 
 
   const handleWorkoutSelect = (workoutId) => {
@@ -181,15 +183,19 @@ return (
   <div className="container">
     <h2>{date.toDateString()}</h2>
     <Calendar onChange={onDateChange} value={date} />
+
     <CreateCategory onCategoryCreated={fetchCategories} />
-    <select value={selectedCategory} onChange={(e) => handleCategoryChange(e.target.value)}>
-      <option value="">Select Category</option>
+
+    <div className="category-selection">
       {categories.map(category => (
-        <option key={category._id} value={category._id}>
-          {category.name}
-        </option>
+        <CategoryCard
+          key={category._id}
+          category={category}
+          setSelectedCategory={handleCategoryChange}
+          selectedCategory={selectedCategory}
+        />
       ))}
-    </select>
+    </div>
 
     {workoutsByCategory.length > 0 && (
       <div>

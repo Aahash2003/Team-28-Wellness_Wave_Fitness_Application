@@ -102,12 +102,11 @@ router.get('/user/:email/workouts', async (req, res) => {
 
 
 
-
 router.post('/createCategory', async (req, res) => {
-    const { name, description } = req.body;
+    const { name, description, imageUrl } = req.body;
 
     try {
-        const newCategory = new WorkoutCategory({ name, description });
+        const newCategory = new WorkoutCategory({ name, description, imageUrl });
         await newCategory.save();
         res.status(201).json(newCategory);
     } catch (error) {
@@ -141,7 +140,6 @@ router.post('/createWorkoutPlan', async (req, res) => {
     }
 });
 */
-// Get all workout categories
 router.get('/workoutCategories', async (req, res) => {
     try {
         const categories = await WorkoutCategory.find();
@@ -151,6 +149,7 @@ router.get('/workoutCategories', async (req, res) => {
     }
 });
 
+// Get workouts by category
 router.get('/category/:categoryId/workouts', async (req, res) => {
     const { categoryId } = req.params;
 
@@ -161,5 +160,4 @@ router.get('/category/:categoryId/workouts', async (req, res) => {
         res.status(400).send(error.message);
     }
 });
-
 module.exports = router;

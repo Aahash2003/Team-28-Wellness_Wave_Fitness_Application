@@ -24,6 +24,7 @@ const workoutSchema = new mongoose.Schema({
 const workoutCategorySchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: String,
+    imageUrl: { type: String, required: true },
     workouts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Workout' }]
 });
 
