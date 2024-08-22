@@ -35,7 +35,10 @@ router.post('/logWorkout', async (req, res) => {
             workout = await Workout.findOne({ 
                 user: user._id, 
                 category: categoryId, 
-                date: new Date(date).toISOString(), // Ensure the date matches the specific date 
+                date: {
+                    $gte: new Date(date).setHours(0, 0, 0, 0), // Start of the day
+                    $lte: new Date(date).setHours(23, 59, 59, 999) // End of the day
+                },
                 'exercises.name': { $in: exercises.map(e => e.name) } 
             });
 
@@ -45,7 +48,7 @@ router.post('/logWorkout', async (req, res) => {
                     exercises,
                     user: user._id,
                     category: category._id,
-                    date: new Date(date).toISOString() // Store the date correctly
+                    date: new Date(date) // Store the date correctly
                 });
 
                 // Add the new workout to the category
@@ -66,6 +69,7 @@ router.post('/logWorkout', async (req, res) => {
         res.status(400).send(error.message);
     }
 });
+
 
 
 router.get('/user/:email/workouts', async (req, res) => {

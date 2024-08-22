@@ -4,8 +4,10 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import CreateCategory from './CreateCategory';
 import CategoryCard from './CategoryCard';
+import HorizontalScrollbar from './HorizontalScrollBar';
 import './Workout.css'; // Import the CSS file for styling
 import { Stack } from '@mui/material';
+
 
 const WorkoutLogger = () => {
   const email = localStorage.getItem('email'); // Local storage set in the login
@@ -146,27 +148,28 @@ const WorkoutLogger = () => {
         alert('Please add at least one exercise with a valid name.');
         return;
     }
-console.log("Date: "+date.toISOString())
+
     try {
         const payload = {
             exercises,
             email,
-            date: date.toISOString(),  // Send the selected date in ISO format
+            date: date.toISOString(),  // Include the selected date from the calendar
             categoryId: selectedCategory,
         };
 
-        if (selectedWorkout) {
-            payload.workoutId = selectedWorkout._id; // Pass the workoutId if editing an existing workout
+        if (selectedWorkout && selectedWorkout.date === date.toISOString()) {
+            payload.workoutId = selectedWorkout._id; // Only pass the workoutId if editing the exact same workout
         }
 
         const response = await axios.post('http://localhost:8080/api/workout/logWorkout', payload);
         alert('Workout logged successfully');
-        fetchWorkouts();  // Refresh the workouts list
+        fetchWorkoutsByCategory(selectedCategory);  // Refresh the workouts list
     } catch (error) {
         console.error("Error logging workout:", error.response?.data || error.message);
         alert('Error logging workout: ' + (error.response?.data.message || error.message));
     }
 };
+
 
   const onDateChange = (newDate) => {
     setDate(newDate);
@@ -189,29 +192,12 @@ return (
 
     <div className="category-selection">
 
-    <Stack
-  direction="row" // Set the direction to 'row' for horizontal alignment
-  spacing={2} // Add spacing between each CategoryCard
-  className="category-selection"
-  sx={{
-    overflowX: 'auto', // Enable horizontal scrolling if content overflows
-    whiteSpace: 'nowrap', // Prevent line breaks inside the container
-    padding: '10px', // Optional: Add padding inside the container
-  }}
->
-  {categories.map(category => (
-    <CategoryCard
-      key={category._id}
-      category={category}
-      setSelectedCategory={(categoryId) => {
-        handleCategoryChange(categoryId);
-        // Add the scroll effect when a category is selected
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); // Adjust 'top' and 'left' as needed
-      }}
-      selectedCategory={selectedCategory}
-    />
-  ))}
-</Stack>
+   
+<HorizontalScrollbar
+  categories={categories}
+  handleCategoryChange={handleCategoryChange}
+  selectedCategory={selectedCategory}
+/>
 
 
     </div>
