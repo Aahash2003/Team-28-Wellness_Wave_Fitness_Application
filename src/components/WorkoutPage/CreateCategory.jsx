@@ -36,12 +36,7 @@ const CreateCategory = ({ onCategoryCreated }) => {
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
             />
-            <input
-                type="text"
-                placeholder="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-            />
+            
 
             
 
@@ -51,3 +46,11 @@ const CreateCategory = ({ onCategoryCreated }) => {
 };
 
 export default CreateCategory;
+/*
+<input
+                type="text"
+                placeholder="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+            />
+*/

@@ -10,6 +10,7 @@ const CategoryCard = ({ category, setSelectedCategory, selectedCategory }) => (
     sx={selectedCategory === category._id ? { borderTop: '4px solid #FF2625', background: '#fff', borderBottomLeftRadius: '20px', width: '270px', height: '282px', cursor: 'pointer', gap: '47px' } : { background: '#fff', borderBottomLeftRadius: '20px', width: '270px', height: '282px', cursor: 'pointer', gap: '47px' }}
     onClick={() => {
       setSelectedCategory(category._id);
+      window.scrollTo({ top: 1800, left: 100, behavior: 'smooth' });
     }}
   >
     <img src={category.imageUrl} alt={category.name} style={{ width: '40px', height: '40px' }} />

@@ -5,6 +5,7 @@ import 'react-calendar/dist/Calendar.css';
 import CreateCategory from './CreateCategory';
 import CategoryCard from './CategoryCard';
 import './Workout.css'; // Import the CSS file for styling
+import { Stack } from '@mui/material';
 
 const WorkoutLogger = () => {
   const email = localStorage.getItem('email'); // Local storage set in the login
@@ -187,14 +188,32 @@ return (
     <CreateCategory onCategoryCreated={fetchCategories} />
 
     <div className="category-selection">
-      {categories.map(category => (
-        <CategoryCard
-          key={category._id}
-          category={category}
-          setSelectedCategory={handleCategoryChange}
-          selectedCategory={selectedCategory}
-        />
-      ))}
+
+    <Stack
+  direction="row" // Set the direction to 'row' for horizontal alignment
+  spacing={2} // Add spacing between each CategoryCard
+  className="category-selection"
+  sx={{
+    overflowX: 'auto', // Enable horizontal scrolling if content overflows
+    whiteSpace: 'nowrap', // Prevent line breaks inside the container
+    padding: '10px', // Optional: Add padding inside the container
+  }}
+>
+  {categories.map(category => (
+    <CategoryCard
+      key={category._id}
+      category={category}
+      setSelectedCategory={(categoryId) => {
+        handleCategoryChange(categoryId);
+        // Add the scroll effect when a category is selected
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); // Adjust 'top' and 'left' as needed
+      }}
+      selectedCategory={selectedCategory}
+    />
+  ))}
+</Stack>
+
+
     </div>
 
     {workoutsByCategory.length > 0 && (
