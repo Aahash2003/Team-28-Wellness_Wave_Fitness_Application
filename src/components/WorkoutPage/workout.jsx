@@ -29,13 +29,21 @@ const WorkoutLogger = () => {
   }, [email]);
 
   const fetchCategories = async () => {
-    try {
-      const response = await axios.get(`${baseURL}api/workout/workoutCategories`);
-      setCategories(response.data);
-    } catch (error) {
-      alert('Error fetching workout categories: ' + error.message);
+    const email = localStorage.getItem('email'); // Retrieve email from localStorage
+    if (!email) {
+        alert('User email is missing. Please log in again.');
+        return;
     }
-  };
+
+    try {
+        const response = await axios.get(`${baseURL}api/workout/workoutCategories`, {
+            params: { email }  // Pass email as a query parameter
+        });
+        setCategories(response.data);
+    } catch (error) {
+        alert('Error fetching workout categories: ' + error.message);
+    }
+};
 
   useEffect(() => {
     if (email && date) {
@@ -95,6 +103,26 @@ const WorkoutLogger = () => {
     }
 };
 
+const onCategoryCreated = () => {
+  // This function should re-fetch the categories or update the state in some way
+  fetchCategories();
+};
+const handleDeleteCategory = async (categoryId) => {
+  const email = localStorage.getItem('email');
+  if (!window.confirm('Are you sure you want to delete this category?')) {
+      return;
+  }
+
+  try {
+      await axios.delete(`${baseURL}api/workout/category/${categoryId}`, {
+          data: { email }
+      });
+      alert('Category deleted successfully');
+      fetchCategories(); // Refresh categories after deletion
+  } catch (error) {
+      alert('Error deleting category: ' + (error.response?.data?.message || error.message));
+  }
+};
 
 
   const handleWorkoutSelect = (workoutId) => {
@@ -190,7 +218,8 @@ return (
     <h2>{date.toDateString()}</h2>
     <Calendar onChange={onDateChange} value={date} />
 
-    <CreateCategory onCategoryCreated={fetchCategories} />
+    <CreateCategory onCategoryCreated={onCategoryCreated} categories={categories} handleDeleteCategory={handleDeleteCategory} />
+
 
     <div className="category-selection">
 

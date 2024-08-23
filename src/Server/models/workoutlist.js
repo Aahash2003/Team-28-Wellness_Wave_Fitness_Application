@@ -9,7 +9,6 @@ const exerciseSchema = new mongoose.Schema({
     weight: { type: Number, required: true },
     restTime: { type: Number, required: true },
     currentRepMax: { type: Number, default: false },
-
 });
 
 // Define the Workout schema, which can include multiple exercises
@@ -25,6 +24,7 @@ const workoutCategorySchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: String,
     imageUrl: { type: String, required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     workouts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Workout' }]
 });
 
