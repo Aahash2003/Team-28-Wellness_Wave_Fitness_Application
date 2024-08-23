@@ -4,16 +4,20 @@ const { Workout, WorkoutLog, WorkoutCategory, UserWorkoutPlan } = require('../mo
 
 const router = express.Router();
 
+const getUserByEmail = async (email) => {
+    const user = await User.findOne({ email });
+    if (!user) {
+        throw new Error('User not found');
+    }
+    return user;
+};
+
 router.post('/logWorkout', async (req, res) => {
     const { email, exercises, categoryId, workoutId, date } = req.body;
 
     try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).send('User not found');
-        }
+        const user = await getUserByEmail(email);
 
-        // Find the category to ensure it exists
         const category = await WorkoutCategory.findById(categoryId);
         if (!category) {
             return res.status(404).send('Category not found');
@@ -22,39 +26,34 @@ router.post('/logWorkout', async (req, res) => {
         let workout;
 
         if (workoutId) {
-            // Update existing workout if workoutId is provided
             workout = await Workout.findById(workoutId);
             if (workout) {
                 workout.exercises = exercises;
-                workout.date = date ? new Date(date) : workout.date; // Update the date only if a new date is provided
+                workout.date = date ? new Date(date) : workout.date;
             } else {
                 return res.status(404).send('Workout not found');
             }
         } else {
-            // Look for a workout with the same exercises and date within the same category
-            workout = await Workout.findOne({ 
-                user: user._id, 
-                category: categoryId, 
+            workout = await Workout.findOne({
+                user: user._id,
+                category: categoryId,
                 date: {
-                    $gte: new Date(date).setHours(0, 0, 0, 0), // Start of the day
-                    $lte: new Date(date).setHours(23, 59, 59, 999) // End of the day
+                    $gte: new Date(date).setHours(0, 0, 0, 0),
+                    $lte: new Date(date).setHours(23, 59, 59, 999)
                 },
-                'exercises.name': { $in: exercises.map(e => e.name) } 
+                'exercises.name': { $in: exercises.map(e => e.name) }
             });
 
             if (!workout) {
-                // Create a new workout if no existing workout matches both date and exercises
                 workout = new Workout({
                     exercises,
                     user: user._id,
                     category: category._id,
-                    date: new Date(date) // Store the date correctly
+                    date: new Date(date)
                 });
 
-                // Add the new workout to the category
                 category.workouts.push(workout._id);
             } else {
-                // If a workout with the same exercises exists on the same date, update it
                 workout.exercises = exercises;
             }
         }
@@ -70,57 +69,35 @@ router.post('/logWorkout', async (req, res) => {
     }
 });
 
-
-
 router.get('/user/:email/workouts', async (req, res) => {
     const { email } = req.params;
     const { date } = req.query;
 
     try {
-        // Convert the provided date to the start and end of the day in UTC
         const startOfDayUTC = new Date(date);
-        startOfDayUTC.setUTCHours(0, 0, 0, 0);  // Start of UTC day
-        
-        const endOfDayUTC = new Date(date);
-        endOfDayUTC.setUTCHours(23, 59, 59, 999);  // End of UTC day
+        startOfDayUTC.setUTCHours(0, 0, 0, 0);
 
-        const user = await User.findOne({ email }).populate({
-            path: 'workouts',
-            match: {
-                date: {
-                    $gte: startOfDayUTC,
-                    $lte: endOfDayUTC
-                }
+        const endOfDayUTC = new Date(date);
+        endOfDayUTC.setUTCHours(23, 59, 59, 999);
+
+        const user = await getUserByEmail(email);
+
+        const workouts = await Workout.find({
+            user: user._id,
+            date: {
+                $gte: startOfDayUTC,
+                $lte: endOfDayUTC
             }
         });
 
-        if (!user) {
-            return res.status(404).send('User not found');
-        }
-
-        res.status(200).json(user.workouts);
+        res.status(200).json(workouts);
     } catch (error) {
         res.status(400).send(error.message);
     }
 });
-
-
 
 router.post('/createCategory', async (req, res) => {
-    const { name, description, imageUrl } = req.body;
-
-    try {
-        const newCategory = new WorkoutCategory({ name, description, imageUrl });
-        await newCategory.save();
-        res.status(201).json(newCategory);
-    } catch (error) {
-        res.status(400).send(error.message);
-    }
-});
-
-/*// Create a new user workout plan
-router.post('/createWorkoutPlan', async (req, res) => {
-    const { email, planName, description, category, workouts } = req.body;
+    const { name, description, imageUrl, email } = req.body;
 
     try {
         const user = await User.findOne({ email });
@@ -128,40 +105,72 @@ router.post('/createWorkoutPlan', async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        const newWorkoutPlan = new UserWorkoutPlan({
-            user: user._id,
-            planName,
-            description,
-            category,
-            workouts
+        const newCategory = new WorkoutCategory({ 
+            name, 
+            description, 
+            imageUrl, 
+            user: user._id // Associate the category with the user
         });
-
-        await newWorkoutPlan.save();
-
-        res.status(201).json(newWorkoutPlan);
+        await newCategory.save();
+        res.status(201).json(newCategory);
     } catch (error) {
         res.status(400).send(error.message);
     }
 });
-*/
+
+
 router.get('/workoutCategories', async (req, res) => {
+    const { email } = req.query;
+
     try {
-        const categories = await WorkoutCategory.find();
+        const user = await getUserByEmail(email);
+
+        const categories = await WorkoutCategory.find({ user: user._id });
         res.status(200).json(categories);
     } catch (error) {
         res.status(400).send(error.message);
     }
 });
 
-// Get workouts by category
 router.get('/category/:categoryId/workouts', async (req, res) => {
     const { categoryId } = req.params;
+    const { email } = req.query;
 
     try {
-        const workouts = await Workout.find({ category: categoryId });
+        const user = await getUserByEmail(email);
+
+        const workouts = await Workout.find({ category: categoryId, user: user._id });
         res.status(200).json(workouts);
     } catch (error) {
         res.status(400).send(error.message);
     }
 });
+
+router.delete('/category/:categoryId', async (req, res) => {
+    const { categoryId } = req.params;
+    const { email } = req.body; // Assuming the email is sent in the request body
+
+    try {
+        // Find the user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Find the category to delete
+        const category = await WorkoutCategory.findOne({ _id: categoryId, user: user._id });
+        if (!category) {
+            return res.status(404).send('Category not found or does not belong to the user');
+        }
+
+        // Delete the category
+        await WorkoutCategory.deleteOne({ _id: categoryId, user: user._id });
+
+        res.status(200).send('Category deleted successfully');
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
+
 module.exports = router;
