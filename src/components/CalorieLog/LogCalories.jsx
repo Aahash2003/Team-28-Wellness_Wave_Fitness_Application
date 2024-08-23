@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
 
 const LogCalories = ({ selectedDate, onLogSuccess }) => {
   const email = localStorage.getItem('email');
@@ -20,7 +21,7 @@ const LogCalories = ({ selectedDate, onLogSuccess }) => {
         localDate.getDate()
       ));
 
-      const response = await axios.post('http://localhost:8080/api/calories/logcalories', {
+      const response = await axios.post(`${baseURL}api/calories/logcalories`, {
         email,
         localDate: utcDate.toISOString(), // Send the date in UTC format
         calories,

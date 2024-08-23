@@ -1,6 +1,7 @@
 /*
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
 
 const CreateWorkoutPlan = ({ categories, onPlanCreated }) => {
     const [planName, setPlanName] = useState('');
@@ -20,7 +21,7 @@ const CreateWorkoutPlan = ({ categories, onPlanCreated }) => {
         }
 
         try {
-            const response = await axios.post('http://localhost:8080/api/workout/createWorkoutPlan', {
+            const response = await axios.post(`${baseURL}api/workout/createWorkoutPlan`, {
                 email: localStorage.getItem('email'),
                 planName: planName.trim(),
                 description: description.trim(),

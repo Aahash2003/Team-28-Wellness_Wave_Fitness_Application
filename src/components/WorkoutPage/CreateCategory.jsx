@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import image from './Equipment Sign.png'; // Replace with your designated image path
+const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
 
 const CreateCategory = ({ onCategoryCreated }) => {
     const [categoryName, setCategoryName] = useState('');
@@ -13,7 +14,7 @@ const CreateCategory = ({ onCategoryCreated }) => {
         }
 
         try {
-            const response = await axios.post('http://localhost:8080/api/workout/createCategory', {
+            const response = await axios.post(`${baseURL}api/workout/createCategory`, {
                 name: categoryName.trim(),
                 description: description.trim(),
                 imageUrl: image,  // Automatically use the designated image URL

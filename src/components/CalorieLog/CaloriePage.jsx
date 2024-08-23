@@ -6,6 +6,7 @@ import FoodSearch from './FoodSearch';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import axios from 'axios';
+const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
 
 class CaloriePage extends Component {
   state = {
@@ -29,7 +30,7 @@ class CaloriePage extends Component {
     const { email, selectedDate } = this.state;
     try {
       const utcDate = this.convertToUTC(selectedDate);
-      const response = await axios.get(`http://localhost:8080/api/calories/user/${email}/calories`, {
+      const response = await axios.get(`${baseURL}api/calories/user/${email}/calories`, {
         params: { date: utcDate.toISOString().split('T')[0] }
       });
       // Convert each log's date from UTC to local time before updating the state
@@ -48,7 +49,7 @@ class CaloriePage extends Component {
     const { email, selectedDate } = this.state;
     try {
       const utcDate = this.convertToUTC(selectedDate);
-      const response = await axios.get(`http://localhost:8080/api/calc/user/${email}/remaining-calories`, {
+      const response = await axios.get(`${baseURL}api/calc/user/${email}/remaining-calories`, {
         params: { date: utcDate.toISOString().split('T')[0] }
       });
       console.log("API Response:", response.data);

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
+const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
 
 const Login = () => {
     const [data, setData] = useState({ email: "", password: "" });
@@ -16,7 +17,7 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const url = "http://localhost:8080/api/auth";
+            const url = `${baseURL}api/auth`;
             const { data: res } = await axios.post(url, data);
             localStorage.setItem("token", res.data);
             localStorage.setItem("isVerified", res.verified); // Store the verification status
@@ -40,7 +41,7 @@ const Login = () => {
     const handleResendVerification = async () => {
         try {
             const { email } = data;
-            await axios.post('http://localhost:8080/api/auth/resend-verification', { email });
+            await axios.post(`${baseURL}api/auth/resend-verification`, { email });
             setError("Verification email resent. Please check your inbox.");
            setResend(false);
         } catch (error) {

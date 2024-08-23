@@ -14,6 +14,7 @@ import {
     AlertIcon,
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
+const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
 
 const Profile = () => {
     const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ const Profile = () => {
             // Format the dob to remove the time part
             const formattedDOB = dayjs(dob).format('YYYY-MM-DD');
 
-            const res = await axios.post('http://localhost:8080/api/profile/', { ...formData, dob: formattedDOB, email });
+            const res = await axios.post(`${baseURL}api/profile/`, { ...formData, dob: formattedDOB, email });
             setProfile(res.data.profile);
             setError('');
         } catch (err) {
@@ -53,7 +54,7 @@ const Profile = () => {
 
     const handleGetProfile = async () => {
         try {
-            const res = await axios.get(`http://localhost:8080/api/profile/${email}`);
+            const res = await axios.get(`${baseURL}api/profile/${email}`);
             setProfile(res.data);
             setError('');
         } catch (err) {

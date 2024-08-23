@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
 
 const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
   const [query, setQuery] = useState('');
@@ -10,7 +11,7 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
   const handleSearch = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.get(`http://localhost:8080/api/calories/macros?query=${query}&servings=${servings}`);
+      const response = await axios.get(`${baseURL}api/calories/macros?query=${query}&servings=${servings}`);
       setMacros(response.data);
     } catch (error) {
       console.error(error);
@@ -29,7 +30,7 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
       ));
 
       try {
-        const response = await axios.post('http://localhost:8080/api/calories/macros/log', {
+        const response = await axios.post(`${baseURL}api/calories/macros/log`, {
           email,
           date: utcDate.toISOString(), // Send the date in UTC format
           item: macros.item,
