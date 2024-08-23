@@ -13,7 +13,7 @@ import {
   AlertIcon,
   Select,
 } from '@chakra-ui/react';
-
+const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
 const CalorieCalc = () => {
   const [formData, setFormData] = useState({
     targetWeight: '',
@@ -40,7 +40,7 @@ const CalorieCalc = () => {
     // Fetch the caloric maintenance as soon as the component mounts
     const fetchCaloricMaintenance = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/calc/calculate/${email}`);
+        const res = await axios.get(`${baseURL}api/calc/calculate/${email}`);
         const maintenanceValue = parseFloat(res.data.calorie_Maintenance).toFixed(2);
         setCalorieMaintenance(maintenanceValue);
       } catch (err) {
@@ -63,7 +63,7 @@ const CalorieCalc = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.get(`http://localhost:8080/api/calc/calculate-DC/${email}`, {
+      const res = await axios.get(`${baseURL}api/calc/calculate-DC/${email}`, {
         params: formData,
       });
       const dailyCaloriesValue = parseFloat(res.data.dailyCalories).toFixed(2);
@@ -78,7 +78,7 @@ const CalorieCalc = () => {
   const handleStoreCaloricValue = async (type) => {
     try {
       const caloricValue = type === 'maintenance' ? calorieMaintenance : dailyCalories;
-      await axios.post('http://localhost:8080/api/calc/store-caloric-value', {
+      await axios.post(`${baseURL}api/calc/store-caloric-value`, {
         email,
         [type === 'maintenance' ? 'caloricMaintenance' : 'dailyCalories']: caloricValue,
       });
@@ -98,7 +98,7 @@ const CalorieCalc = () => {
     }
 
     try {
-      const res = await axios.get(`http://localhost:8080/api/calc/calculate-macros/${email}`, {
+      const res = await axios.get(`${baseURL}api/calc/calculate-macros/${email}`, {
         params: {
           ...macroForm,
           fat: parseFloat(macroForm.fat),
@@ -127,7 +127,7 @@ const CalorieCalc = () => {
   const handleStoreMacros = async () => {
     try {
       // Make a post request to store macros in the backend
-      await axios.post(`http://localhost:8080/api/calc/store-macros/${email}`, macroGrams);
+      await axios.post(`${baseURL}api/calc/store-macros/${email}`, macroGrams);
       localStorage.setItem("MacroGrams", JSON.stringify(macroGrams)); // Store the calculated macros in local storage
       alert('Macros stored successfully!');
     } catch (err) {

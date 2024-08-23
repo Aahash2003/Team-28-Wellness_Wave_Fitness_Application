@@ -7,6 +7,8 @@ import CategoryCard from './CategoryCard';
 import HorizontalScrollbar from './HorizontalScrollBar';
 import './Workout.css'; // Import the CSS file for styling
 import { Stack } from '@mui/material';
+const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
+
 
 
 const WorkoutLogger = () => {
@@ -28,7 +30,7 @@ const WorkoutLogger = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/workout/workoutCategories');
+      const response = await axios.get(`${baseURL}api/workout/workoutCategories`);
       setCategories(response.data);
     } catch (error) {
       alert('Error fetching workout categories: ' + error.message);
@@ -46,7 +48,7 @@ const WorkoutLogger = () => {
         // Send the UTC date string (YYYY-MM-DD)
         const utcDate = date.toISOString().split('T')[0];
 
-        const response = await axios.get(`http://localhost:8080/api/workout/user/${email}/workouts`, {
+        const response = await axios.get(`${baseURL}api/workout/user/${email}/workouts`, {
             params: {
                 date: utcDate // Send the UTC date
             }
@@ -65,7 +67,7 @@ const WorkoutLogger = () => {
 
   const fetchWorkoutsByCategory = async (categoryId) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/workout/category/${categoryId}/workouts`);
+      const response = await axios.get(`${baseURL}api/workout/category/${categoryId}/workouts`);
       setWorkoutsByCategory(response.data);
 
       // Filter out duplicate workouts by comparing exercise names
@@ -161,7 +163,7 @@ const WorkoutLogger = () => {
             payload.workoutId = selectedWorkout._id; // Only pass the workoutId if editing the exact same workout
         }
 
-        const response = await axios.post('http://localhost:8080/api/workout/logWorkout', payload);
+        const response = await axios.post('${baseURL}api/workout/logWorkout', payload);
         alert('Workout logged successfully');
         fetchWorkoutsByCategory(selectedCategory);  // Refresh the workouts list
     } catch (error) {

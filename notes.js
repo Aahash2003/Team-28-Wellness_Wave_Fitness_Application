@@ -14,3 +14,4 @@
 // Allowed the Users to Select Based on Categories Instead, this allows them to create any split they would like
 // Bug when logging an existing template workout it changes the logs to the with the same name to that exact logs info
 // If they log the same workout multiple times on the same day it causes an issue as its unable to tell the difference apart.
+// The categories that are created are given to all users, we must change it to specific users 
