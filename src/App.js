@@ -3,8 +3,6 @@ import { Route, Routes, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { ChakraProvider } from '@chakra-ui/react';
 
-
-
 import './App.css';
 import ExerciseDetail from './pages/ExerciseDetail';
 import Home from './pages/Home';
@@ -18,6 +16,7 @@ import WorkoutLogger from './components/WorkoutPage/workout';
 import CaloriePage from './components/CalorieLog/CaloriePage';
 import Profile from './components/profile/Profile';
 import CalorieCalc from './components/CalorieCalculator/CalorieCalc';
+
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -30,7 +29,7 @@ const App = () => {
 
   return (
     <Box className="app-container">
-      <Navbar isAuthenticated={isAuthenticated} />
+      <Navbar isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
       <Box className="content-container">
         <Routes>
           <Route path="/" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
@@ -51,7 +50,7 @@ const App = () => {
                   <Profile />
                 </ChakraProvider>
               ) : (
-                <Navigate replace to="/home" />
+                <Navigate replace to="/login" />
               )
             }
           />
@@ -63,7 +62,7 @@ const App = () => {
                   <CalorieCalc />
                 </ChakraProvider>
               ) : (
-                <Navigate replace to="/home" />
+                <Navigate replace to="/login" />
               )
             }
           />
