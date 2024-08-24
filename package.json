@@ -43,15 +43,16 @@
     "webpack": "^5.93.0"
   },
   "scripts": {
-    "start": "node src/server/login.js",
-    "client": "react-scripts --openssl-legacy-provider start",
-    "build": "CI=false react-scripts --openssl-legacy-provider build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "nodemon src/server/login.js",
-    "heroku-postbuild": "npm run build && mv build ../server/build"
-  },
+  "start": "node src/server/login.js",
+  "client": "react-scripts --openssl-legacy-provider start",
+  "build": "cross-env CI=false react-scripts --openssl-legacy-provider build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject",
+  "dev": "concurrently \"npm run server\" \"npm run client\"",
+  "server": "nodemon src/server/login.js",
+  "heroku-postbuild": "npm run build && mv build ../server/build"
+},
+
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -72,6 +73,7 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
     "nodemon": "^3.1.4",
     "webpack-cli": "^5.1.4"
   }
