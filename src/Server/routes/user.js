@@ -6,7 +6,7 @@ const sendEmail = require("../utils/SendEmail");
 const bcrypt = require("bcrypt");
 const dotenv = require('dotenv');
 const path = require('path');  // Ensure path is required
-const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
+const baseURL = 'http://localhost:3000' || 'https://habits-development.netlify.app/';
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../utils/.env') });
 
@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
             token: crypto.randomBytes(32).toString("hex"),
         }).save();
 
-        const url = `${baseURL}/api/users/${user._id}/verify/${token.token}`;
+        const url = `${baseURL}/users/${user._id}/verify/${token.token}`;
         await sendEmail(user.email, "Verify Email", url);
 
         res.status(201).send({ message: "An email was sent to your account. Please verify." });
