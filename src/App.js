@@ -29,7 +29,7 @@ const App = () => {
 
   return (
     <Box className="app-container">
-      <Navbar isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />
+      {isAuthenticated && <Navbar isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated} />}
       <Box className="content-container">
         <Routes>
           <Route path="/" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
@@ -68,7 +68,7 @@ const App = () => {
           />
         </Routes>
       </Box>
-      <Footer />
+      {isAuthenticated && <Footer />}
     </Box>
   );
 };
