@@ -17,10 +17,19 @@ router.post('/logWorkout', async (req, res) => {
 
     try {
         const user = await getUserByEmail(email);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
 
         const category = await WorkoutCategory.findById(categoryId);
         if (!category) {
             return res.status(404).send('Category not found');
+        }
+
+        // Validate and parse the date
+        const parsedDate = date ? new Date(date) : new Date();
+        if (isNaN(parsedDate.getTime())) {
+            return res.status(400).send('Invalid date provided');
         }
 
         let workout;
@@ -29,7 +38,7 @@ router.post('/logWorkout', async (req, res) => {
             workout = await Workout.findById(workoutId);
             if (workout) {
                 workout.exercises = exercises;
-                workout.date = date ? new Date(date) : workout.date;
+                workout.date = parsedDate; // Use the parsed date
             } else {
                 return res.status(404).send('Workout not found');
             }
@@ -38,8 +47,8 @@ router.post('/logWorkout', async (req, res) => {
                 user: user._id,
                 category: categoryId,
                 date: {
-                    $gte: new Date(date).setHours(0, 0, 0, 0),
-                    $lte: new Date(date).setHours(23, 59, 59, 999)
+                    $gte: new Date(parsedDate).setHours(0, 0, 0, 0),
+                    $lte: new Date(parsedDate).setHours(23, 59, 59, 999)
                 },
                 'exercises.name': { $in: exercises.map(e => e.name) }
             });
@@ -49,7 +58,7 @@ router.post('/logWorkout', async (req, res) => {
                     exercises,
                     user: user._id,
                     category: category._id,
-                    date: new Date(date)
+                    date: parsedDate // Use the parsed date
                 });
 
                 category.workouts.push(workout._id);
@@ -68,6 +77,7 @@ router.post('/logWorkout', async (req, res) => {
         res.status(400).send(error.message);
     }
 });
+
 
 router.get('/user/:email/workouts', async (req, res) => {
     const { email } = req.params;
