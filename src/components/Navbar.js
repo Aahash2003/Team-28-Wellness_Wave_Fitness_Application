@@ -48,7 +48,7 @@ const Navbar = ({ isAuthenticated }) => {
           </button>
         ) : (
           <Link 
-            to=""
+            to="/login"
             style={{
               textDecoration: 'none', 
               color: '#3A1212', 
