@@ -1,15 +1,18 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Stack } from '@mui/material';
 
 import Logo from '../Assets/Logo/Logo3.png';
 
-const Navbar = ({ isAuthenticated }) => {
+const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
+  const navigate = useNavigate(); // Initialize the navigate function
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("isVerified");
     localStorage.removeItem("isAdmin");
-    window.location.reload();
+    setIsAuthenticated(false);  // Update authentication state
+    window.location.href = "https://habits-development.netlify.app/"; // Redirect to the base page
   };
 
   return (
