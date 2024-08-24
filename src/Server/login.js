@@ -1,30 +1,34 @@
 require("dotenv").config();
 const express = require("express");
-const app = express();
+const path = require("path");
 const cors = require("cors");
 const connection = require("./db");
-const userRoutes = require("./routes/user");
-const authRoutes = require("./routes/auth");
-const workoutRoutes = require("./routes/workout")
-const caloriesRoutes = require("./routes/calorie")
-const calcRoutes = require("./routes/caloriecalc")
-const profileRoutes = require("./routes/profile")
 
+const app = express();
 
-// database connection
+// Database connection
 connection();
 
-// middlewares
+// Middlewares
 app.use(express.json());
 app.use(cors());
 
-// routes
-app.use("/api/users", userRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/workout", workoutRoutes)
-app.use("/api/calories", caloriesRoutes)
-app.use("/api/calc", calcRoutes)
-app.use("/api/profile", profileRoutes)
+// API Routes
+app.use("/api/users", require("./routes/user"));
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/workout", require("./routes/workout"));
+app.use("/api/calories", require("./routes/calorie"));
+app.use("/api/calc", require("./routes/caloriecalc"));
+app.use("/api/profile", require("./routes/profile"));
 
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'build')));
+
+// The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+// Start the server
 const port = process.env.PORT || 8080;
 app.listen(port, '0.0.0.0', () => console.log(`Listening on port ${port}...`));
