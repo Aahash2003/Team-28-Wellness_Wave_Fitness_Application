@@ -12,7 +12,7 @@ const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
     localStorage.removeItem("isVerified");
     localStorage.removeItem("isAdmin");
     setIsAuthenticated(false);  // Update authentication state
-    window.location.href = "https://habits-development.netlify.app/"; // Redirect to the base page
+    window.location.href = "https://habits-development.netlify.app"; // Redirect to the base page
   };
 
   return (
