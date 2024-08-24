@@ -54,23 +54,7 @@ const CreateCategory = ({ onCategoryCreated, categories, handleDeleteCategory })
             />
             <button onClick={handleCreateCategory}>Create Category</button>
             <div>
-                <h3>Your Categories</h3>
-                {categories.map((category) => (
-                    <div key={category._id} style={{ marginBottom: '20px' }}>
-                        <button
-                            onClick={() => handleDeleteCategory(category._id)}
-                            className="delete-button"
-                            style={{
-                                display: 'block',
-                                margin: '5px auto',
-                                padding: '3px 6px',
-                                fontSize: '0.8em'
-                            }}
-                        >
-                            Delete
-                        </button>
-                    </div>
-                ))}
+                
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollMenu, VisibilityContext } from 'react-horizontal-scrolling-menu';
-import { Box, Typography, Stack, IconButton } from '@mui/material';
+import { Box, Typography, Stack, IconButton, Button } from '@mui/material';
 import './HorizontalScrollBar.css'; // Ensure you have your custom styles here
 import LeftArrowIcon from './left-arrow.png';  // Replace with your own icon path
 import RightArrowIcon from './right-arrow.png'; // Replace with your own icon path
@@ -18,7 +18,7 @@ const LeftArrow = () => {
         top: '70%', 
         transform: 'translateY(-50%)', 
         zIndex: 1,
-        padding: 0, // Remove extra padding around the icon
+        padding: 0, 
         width: '40px', 
         height: '40px' 
       }}
@@ -41,7 +41,7 @@ const RightArrow = () => {
         top: '70%', 
         transform: 'translateY(-50%)', 
         zIndex: 1,
-        padding: 0, // Remove extra padding around the icon
+        padding: 0, 
         width: '40px', 
         height: '40px' 
       }}
@@ -51,7 +51,7 @@ const RightArrow = () => {
   );
 };
 
-const HorizontalScrollbar = ({ categories, handleCategoryChange, selectedCategory }) => (
+const HorizontalScrollbar = ({ categories, handleCategoryChange, selectedCategory, handleDeleteCategory }) => (
   <Box sx={{ position: 'relative', padding: '0 60px' }}>
     <ScrollMenu LeftArrow={<LeftArrow />} RightArrow={<RightArrow />}>
       {categories.map((category) => (
@@ -67,9 +67,9 @@ const HorizontalScrollbar = ({ categories, handleCategoryChange, selectedCategor
             border: selectedCategory === category._id ? '4px solid #FF2625' : 'none',
             borderBottomLeftRadius: '15px',
             width: '270px',
-            height: '252px',
+            height: '300px', // Increased height to accommodate the delete button
             background: '#fff',
-            gap: '20px',
+            gap: '10px',
             margin: '0 20px',
             paddingTop: '20px',
             transition: 'transform 0.2s ease',
@@ -90,6 +90,23 @@ const HorizontalScrollbar = ({ categories, handleCategoryChange, selectedCategor
           >
             {category.name}
           </Typography>
+          <Button
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent triggering category selection
+              handleDeleteCategory(category._id);
+            }}
+            variant="contained"
+            color="error"
+            size="small"
+            sx={{
+              marginTop: '10px',
+              padding: '3px 6px',
+              fontSize: '0.8em',
+              minWidth: 'auto', // Adjust button width to content
+            }}
+          >
+            Delete
+          </Button>
         </Stack>
       ))}
     </ScrollMenu>

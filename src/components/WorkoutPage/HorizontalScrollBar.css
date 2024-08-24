@@ -26,3 +26,32 @@
     transform: scale(1.05);
   }
   
+  .horizontal-scrollbar {
+    display: flex;
+    overflow-x: auto;
+    padding: 10px;
+  }
+  
+  .category-card {
+    position: relative;
+    text-align: center;
+  }
+  
+  .category-card img {
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .category-card .delete-button {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: red;
+    color: white;
+    font-size: 12px;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+  }
+  

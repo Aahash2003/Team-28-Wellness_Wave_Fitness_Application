@@ -74,8 +74,16 @@ const WorkoutLogger = () => {
 
 
   const fetchWorkoutsByCategory = async (categoryId) => {
-    try {
-      const response = await axios.get(`${baseURL}api/workout/category/${categoryId}/workouts`);
+      const email = localStorage.getItem('email'); // Retrieve email from localStorage
+      if (!email) {
+          alert('User email is missing. Please log in again.');
+          return;
+      }
+  
+      try {
+        const response = await axios.get(`${baseURL}api/workout/category/${categoryId}/workouts`, {
+              params: { email }
+        });
       setWorkoutsByCategory(response.data);
 
       // Filter out duplicate workouts by comparing exercise names
@@ -180,23 +188,30 @@ const handleDeleteCategory = async (categoryId) => {
     }
 
     try {
+        // Validate and parse the date
+        const parsedDate = date ? new Date(date) : new Date();
+        if (isNaN(parsedDate.getTime())) {
+            alert('Invalid date selected. Please choose a valid date.');
+            return;
+        }
+
         const payload = {
             exercises,
             email,
-            date: date.toISOString(),  // Include the selected date from the calendar
+            date: parsedDate.toISOString(),  // Include the validated date
             categoryId: selectedCategory,
         };
 
-        if (selectedWorkout && selectedWorkout.date === date.toISOString()) {
+        if (selectedWorkout && new Date(selectedWorkout.date).toISOString() === parsedDate.toISOString()) {
             payload.workoutId = selectedWorkout._id; // Only pass the workoutId if editing the exact same workout
         }
 
-        const response = await axios.post('${baseURL}api/workout/logWorkout', payload);
+        const response = await axios.post(`${baseURL}api/workout/logWorkout`, payload);
         alert('Workout logged successfully');
         fetchWorkoutsByCategory(selectedCategory);  // Refresh the workouts list
     } catch (error) {
         console.error("Error logging workout:", error.response?.data || error.message);
-        alert('Error logging workout: ' + (error.response?.data.message || error.message));
+        alert('Error logging workout: ' + (error.response?.data?.message || error.message));
     }
 };
 
@@ -218,19 +233,19 @@ return (
     <h2>{date.toDateString()}</h2>
     <Calendar onChange={onDateChange} value={date} />
 
-    <CreateCategory onCategoryCreated={onCategoryCreated} categories={categories} handleDeleteCategory={handleDeleteCategory} />
-
+    <CreateCategory 
+      onCategoryCreated={onCategoryCreated} 
+      categories={categories} 
+      handleDeleteCategory={handleDeleteCategory} 
+    />
 
     <div className="category-selection">
-
-   
-<HorizontalScrollbar
-  categories={categories}
-  handleCategoryChange={handleCategoryChange}
-  selectedCategory={selectedCategory}
-/>
-
-
+      <HorizontalScrollbar
+        categories={categories}
+        handleCategoryChange={handleCategoryChange}
+        selectedCategory={selectedCategory}
+        handleDeleteCategory={handleDeleteCategory}  // Pass handleDeleteCategory to HorizontalScrollbar
+      />
     </div>
 
     {workoutsByCategory.length > 0 && (
@@ -308,18 +323,14 @@ return (
       </div>
     ))}
 
-<button onClick={handleLogWorkout}>
-  {selectedWorkout ? 'Update Workout' : 'Log Workout'} for {date.toDateString()}
-</button>
-<h2>
-  
-</h2>
+    <button onClick={handleLogWorkout}>
+      {selectedWorkout ? 'Update Workout' : 'Log Workout'} for {date.toDateString()}
+    </button>
 
     <h2>Your Workouts for {date.toDateString()}</h2>
     {workouts.length > 0 ? (
       <ul className="workout-list">
         {workouts.map((workout) => {
-          // Convert the workout date to local time and compare
           const workoutDate = new Date(workout.date).toLocaleDateString();
           const selectedDate = date.toLocaleDateString();
 
