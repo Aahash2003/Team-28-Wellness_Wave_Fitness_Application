@@ -1,1 +1,1 @@
-web: node gym_app/src/Server/login.js
+web: node src/Server/login.js
