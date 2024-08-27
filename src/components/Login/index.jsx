@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 const baseURL = process.env.NODE_ENV === 'development'
     ? 'http://localhost:8080/'
-    : 'https://habits-development.netlify.app/';
+    : 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
 
 
 const Login = () => {

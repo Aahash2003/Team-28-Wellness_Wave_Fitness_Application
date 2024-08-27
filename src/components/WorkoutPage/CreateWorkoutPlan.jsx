@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 const baseURL = process.env.NODE_ENV === 'development'
     ? 'http://localhost:8080/'
-    : 'https://habits-development.netlify.app/';
+    : 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
 
 
 const CreateWorkoutPlan = ({ categories, onPlanCreated }) => {
