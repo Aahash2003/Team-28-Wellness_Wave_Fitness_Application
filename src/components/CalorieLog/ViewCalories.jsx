@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { Box, Heading, Text, List, ListItem, Button, Alert } from '@chakra-ui/react';
-const baseURL = 'http://localhost:8080/' || 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
+const baseURL = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8080/'
+    : 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
+
 
 const ViewCalories = ({ calories, selectedDate, onDeleteSuccess }) => {
   const [filteredCalories, setFilteredCalories] = useState([]);
