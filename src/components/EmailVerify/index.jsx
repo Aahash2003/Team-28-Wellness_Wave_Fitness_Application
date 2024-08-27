@@ -4,7 +4,10 @@ import axios from "axios";
 import success from "../images/success.png";
 import styles from "./styles.module.css";
 import { Fragment } from "react";
-const baseURL = 'http://localhost:8080/' || 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
+const baseURL = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8080/'
+    : 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
+
 
 const EmailVerify = () => {
 	const [validUrl, setValidUrl] = useState(true);

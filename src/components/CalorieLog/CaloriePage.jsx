@@ -6,7 +6,10 @@ import FoodSearch from './FoodSearch';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import axios from 'axios';
-const baseURL = 'http://localhost:8080/' || 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
+const baseURL = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8080/'
+    : 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
+
 
 class CaloriePage extends Component {
   state = {

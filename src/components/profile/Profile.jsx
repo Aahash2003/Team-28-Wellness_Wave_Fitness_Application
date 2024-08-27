@@ -14,7 +14,10 @@ import {
     AlertIcon,
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
-const baseURL = 'http://localhost:8080/' || 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
+const baseURL = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8080/'
+    : 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
+
 
 const Profile = () => {
     const [formData, setFormData] = useState({
