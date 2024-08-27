@@ -25,6 +25,7 @@
     "joi-password-complexity": "^5.2.0",
     "legacy": "^0.0.3",
     "mongodb": "^6.8.0",
+    "mongoose": "^8.5.4",
     "node-polyfill-webpack-plugin": "^4.0.0",
     "nodemailer": "^6.9.14",
     "peer": "^1.0.0",
