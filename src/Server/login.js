@@ -22,11 +22,11 @@ app.use("/api/calc", require("./routes/caloriecalc"));
 app.use("/api/profile", require("./routes/profile"));
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, '../../build'))); // Adjusted path to reflect typical project structure
 
 // The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, '../../build', 'index.html')); // Adjusted path
 });
 
 // Start the server
