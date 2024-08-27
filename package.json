@@ -23,6 +23,7 @@
     "https-browserify": "^1.0.0",
     "joi": "^17.13.3",
     "joi-password-complexity": "^5.2.0",
+    "jsonwebtoken": "^9.0.2",
     "legacy": "^0.0.3",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.4",
