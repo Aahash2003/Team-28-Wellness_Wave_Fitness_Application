@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 const baseURL = process.env.NODE_ENV === 'development'
     ? 'http://localhost:8080/'
-    : 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
+    : 'https://habits-development.netlify.app/';
 
 
 const LogCalories = ({ selectedDate, onLogSuccess }) => {
