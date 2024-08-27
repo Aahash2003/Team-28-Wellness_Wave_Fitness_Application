@@ -14,7 +14,7 @@ import {
     AlertIcon,
 } from '@chakra-ui/react';
 import dayjs from 'dayjs';
-const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
+const baseURL = 'http://localhost:8080/' || 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
 
 const Profile = () => {
     const [formData, setFormData] = useState({

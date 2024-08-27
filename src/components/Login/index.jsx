@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
-const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
+const baseURL = 'http://localhost:8080/' || 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
 
 const Login = () => {
     const [data, setData] = useState({ email: "", password: "" });
