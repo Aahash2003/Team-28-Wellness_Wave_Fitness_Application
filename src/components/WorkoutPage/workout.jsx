@@ -7,7 +7,7 @@ import CategoryCard from './CategoryCard';
 import HorizontalScrollbar from './HorizontalScrollBar';
 import './Workout.css'; // Import the CSS file for styling
 import { Stack } from '@mui/material';
-const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
+const baseURL = 'http://localhost:8080/' || 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
 
 
 

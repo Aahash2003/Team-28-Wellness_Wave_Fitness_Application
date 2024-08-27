@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import styles from "./styles.module.css";
-const baseURL = 'http://localhost:8080/' || 'https://habits-development.netlify.app/';
+const baseURL = 'http://localhost:8080/' || 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
 
 const Signup = () => {
 	const [data, setData] = useState({
