@@ -6,7 +6,7 @@ const sendEmail = require("../utils/SendEmail");
 const bcrypt = require("bcrypt");
 const dotenv = require('dotenv');
 const path = require('path');  // Ensure path is required
-const baseURL =  'https://habits-development.netlify.app/' || 'http://localhost:3000';
+const baseURL =  'https://habits-development.netlify.app/';
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../utils/.env') });
 
