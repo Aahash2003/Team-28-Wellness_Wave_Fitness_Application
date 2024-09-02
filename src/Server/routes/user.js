@@ -6,7 +6,7 @@ const sendEmail = require("../utils/SendEmail");
 const bcrypt = require("bcrypt");
 const dotenv = require('dotenv');
 const path = require('path');  // Ensure path is required
-const baseURL =  'https://habits-development.netlify.app/';
+const baseURL =  'https://mustang-central-eb5dd97b4796.herokuapp.com/';
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '../utils/.env') });
 
@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
             token: crypto.randomBytes(32).toString("hex"),
         }).save();
 
-        const url = `${baseURL}/users/${user._id}/verify/${token.token}`;
+        const url = `https://mustang-central-eb5dd97b4796.herokuapp.com/users/${user._id}/verify/${token.token}`;
         await sendEmail(user.email, "Verify Email", url);
 
         res.status(201).send({ message: "An email was sent to your account. Please verify." });
