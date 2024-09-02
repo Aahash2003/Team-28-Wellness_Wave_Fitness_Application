@@ -12,6 +12,8 @@
 // AI might be a cool feature
 // Lets Develop an Organized Workout List based on the Muscle Group, possibly an icon for each muscle, which the user selects
 // Allowed the Users to Select Based on Categories Instead, this allows them to create any split they would like
-// Bug when logging an existing template workout it changes the logs to the with the same name to that exact logs info
-// If they log the same workout multiple times on the same day it causes an issue as its unable to tell the difference apart.
-// The categories that are created are given to all users, we must change it to specific users 
+// Bug when logging an existing template workout it changes the logs to the with the same name to that exact logs info ✅
+// If they log the same workout multiple times on the same day it causes an issue as its unable to tell the difference apart. 
+// The categories that are created are given to all users, we must change it to specific users ✅
+// A bug for the deployed version whenever the user refreshes the app crashes, as in local host it would just go to home 
+// Somethings off with calorie log for getting the logs 
