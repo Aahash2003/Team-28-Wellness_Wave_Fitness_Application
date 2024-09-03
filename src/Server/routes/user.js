@@ -53,7 +53,7 @@ router.get("/:id/verify/:token/", async (req, res) => {
         await Token.deleteOne({ _id: token._id });
 
         // Redirect to login page after successful verification
-        res.redirect('https://habits-development.netlify.app/login');
+        res.redirect('https://habits-development.netlify.app');
     } catch (error) {
         console.error(error);
         res.status(500).send({ message: "Server Error", error: error.message });
