@@ -20,6 +20,7 @@ const WorkoutLogger = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [workoutsByCategory, setWorkoutsByCategory] = useState([]);
+  const [error, setError] = useState('');
   const [selectedWorkout, setSelectedWorkout] = useState(null); // New state for selected workout
   const [exercises, setExercises] = useState([
     { name: '', sets: '', reps: '', weight: '', restTime: '', currentRepMax: '', oneRepMax: '' }
@@ -34,7 +35,7 @@ const WorkoutLogger = () => {
   const fetchCategories = async () => {
     const email = localStorage.getItem('email'); // Retrieve email from localStorage
     if (!email) {
-        alert('User email is missing. Please log in again.');
+        setError('User email is missing. Please log in again.');
         return;
     }
 
@@ -44,7 +45,7 @@ const WorkoutLogger = () => {
         });
         setCategories(response.data);
     } catch (error) {
-        alert('Error fetching workout categories: ' + error.message);
+        setError('Error fetching workout categories: ' + error.message);
     }
 };
 
@@ -69,7 +70,7 @@ const WorkoutLogger = () => {
         setWorkouts(response.data);
         console.log(response.data)
     } catch (error) {
-        alert('Error fetching workouts: ' + error.message);
+        setError('Error fetching workouts: ' + error.message);
     }
 };
 
@@ -79,7 +80,7 @@ const WorkoutLogger = () => {
   const fetchWorkoutsByCategory = async (categoryId) => {
       const email = localStorage.getItem('email'); // Retrieve email from localStorage
       if (!email) {
-          alert('User email is missing. Please log in again.');
+          setError('User email is missing. Please log in again.');
           return;
       }
   
@@ -100,7 +101,7 @@ const WorkoutLogger = () => {
 
       setWorkoutsByCategory(uniqueWorkouts);
     } catch (error) {
-      alert('Error fetching workouts by category: ' + error.message);
+      setError('Error fetching workouts by category: ' + error.message);
     }
   };
 
@@ -128,10 +129,10 @@ const handleDeleteCategory = async (categoryId) => {
       await axios.delete(`${baseURL}api/workout/category/${categoryId}`, {
           data: { email }
       });
-      alert('Category deleted successfully');
+      setError('Category deleted successfully');
       fetchCategories(); // Refresh categories after deletion
   } catch (error) {
-      alert('Error deleting category: ' + (error.response?.data?.message || error.message));
+      setError('Error deleting category: ' + (error.response?.data?.message || error.message));
   }
 };
 
@@ -181,12 +182,12 @@ const handleDeleteCategory = async (categoryId) => {
 
   const handleLogWorkout = async () => {
     if (!selectedCategory) {
-        alert('Please select a workout category.');
+        setError('Please select a workout category.');
         return;
     }
 
     if (exercises.length === 0 || !exercises[0].name.trim()) {
-        alert('Please add at least one exercise with a valid name.');
+        setError('Please add at least one exercise with a valid name.');
         return;
     }
 
@@ -194,7 +195,7 @@ const handleDeleteCategory = async (categoryId) => {
         // Validate and parse the date
         const parsedDate = date ? new Date(date) : new Date();
         if (isNaN(parsedDate.getTime())) {
-            alert('Invalid date selected. Please choose a valid date.');
+            setError('Invalid date selected. Please choose a valid date.');
             return;
         }
 
@@ -210,11 +211,11 @@ const handleDeleteCategory = async (categoryId) => {
         }
 
         const response = await axios.post(`${baseURL}api/workout/logWorkout`, payload);
-        alert('Workout logged successfully');
+        setError('Workout logged successfully');
         fetchWorkoutsByCategory(selectedCategory);  // Refresh the workouts list
     } catch (error) {
         console.error("Error logging workout:", error.response?.data || error.message);
-        alert('Error logging workout: ' + (error.response?.data?.message || error.message));
+        setError('Error logging workout: ' + (error.response?.data?.message || error.message));
     }
 };
 
@@ -233,6 +234,12 @@ const filteredWorkouts = workoutsByCategory.filter(workout => {
 
 return (
   <div className="container">
+     {error && (
+        <Alert status="error" mb={4}>
+          <AlertIcon />
+          {error}
+        </Alert>
+      )}
     <h2>{date.toDateString()}</h2>
     <Calendar onChange={onDateChange} value={date} />
 

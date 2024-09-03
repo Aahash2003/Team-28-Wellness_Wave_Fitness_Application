@@ -9,15 +9,16 @@ const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8080/';
 const CreateCategory = ({ onCategoryCreated, categories, handleDeleteCategory }) => {  // Accept handleDeleteCategory as a prop
     const [categoryName, setCategoryName] = useState('');
     const [description, setDescription] = useState('');
+    const [error, setError] = useState('');
 
     const handleCreateCategory = async () => {
         if (!categoryName.trim()) {
-            alert('Please enter a category name.');
+            setError('Please enter a category name.');
             return;
         }
 
         if (!email) {
-            alert('User email is missing. Please log in again.');
+            setError('User email is missing. Please log in again.');
             return;
         }
 
@@ -28,17 +29,23 @@ const CreateCategory = ({ onCategoryCreated, categories, handleDeleteCategory })
                 imageUrl: image,
                 email,
             });
-            alert('Category created successfully');
+            console.log('Category created successfully');
             onCategoryCreated();
             setCategoryName('');
             setDescription('');
         } catch (error) {
-            alert('Error creating category: ' + (error.response?.data?.message || error.message));
+            setError('Error creating category: ' + (error.response?.data?.message || error.message));
         }
     };
 
     return (
         <div>
+            {error && (
+        <Alert status="error" mb={4}>
+          <AlertIcon />
+          {error}
+        </Alert>
+      )}
             <h3>Create New Workout Category</h3>
             <input
                 type="text"

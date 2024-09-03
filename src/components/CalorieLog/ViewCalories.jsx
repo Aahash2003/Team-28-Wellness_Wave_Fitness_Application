@@ -36,11 +36,11 @@ const ViewCalories = ({ calories, selectedDate, onDeleteSuccess }) => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${baseURL}api/calories/logcalories/${id}`);
-      alert('Calorie log deleted');
+      console.log('Calorie log deleted');
       onDeleteSuccess(); // Trigger the parent to refresh the logs
     } catch (error) {
       console.error('Error deleting calorie log:', error);
-      alert('Error deleting calorie log');
+      console.log('Error deleting calorie log');
     }
   };
 

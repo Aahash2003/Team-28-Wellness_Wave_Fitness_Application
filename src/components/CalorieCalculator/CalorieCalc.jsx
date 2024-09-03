@@ -47,7 +47,7 @@ const CalorieCalc = () => {
         const maintenanceValue = parseFloat(res.data.calorie_Maintenance).toFixed(2);
         setCalorieMaintenance(maintenanceValue);
       } catch (err) {
-        setError('Error fetching caloric maintenance. Please try again later.');
+        setError('Please initialize your profile prior to calculating your Caloric Intake.');
         setCalorieMaintenance(null);
       }
     };
@@ -86,7 +86,7 @@ const CalorieCalc = () => {
         [type === 'maintenance' ? 'caloricMaintenance' : 'dailyCalories']: caloricValue,
       });
       localStorage.setItem('dailyCalories', caloricValue);
-      alert('Caloric value stored successfully!');
+      console.log('Caloric value stored successfully!');
     } catch (err) {
       setError('Error storing caloric value. Please try again later.');
     }
@@ -132,7 +132,7 @@ const CalorieCalc = () => {
       // Make a post request to store macros in the backend
       await axios.post(`${baseURL}api/calc/store-macros/${email}`, macroGrams);
       localStorage.setItem("MacroGrams", JSON.stringify(macroGrams)); // Store the calculated macros in local storage
-      alert('Macros stored successfully!');
+      console.log('Macros stored successfully!');
     } catch (err) {
       setError('Error storing macronutrient values. Please try again later.');
     }
