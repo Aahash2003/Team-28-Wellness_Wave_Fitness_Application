@@ -23,10 +23,8 @@ const EmailVerify = () => {
 				console.log(data);
 				setValidUrl(true);
 
-				// Redirect to login page after 3 seconds
-				setTimeout(() => {
-					window.location.href = "https://habits-development.netlify.app/login";
-				}, 1000);
+				window.location.href = "https://habits-development.netlify.app/login";
+
 
 			} catch (error) {
 				console.log(error.response.data);
