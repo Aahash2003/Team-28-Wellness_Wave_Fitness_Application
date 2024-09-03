@@ -27,9 +27,9 @@ const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
       </Link>
       <Stack alignItems="center" direction="row" gap="40px" fontSize="24px">
         <Link to="/home" style={{ textDecoration: 'none', color: '#3A1212', borderBottom: '3px solid #3A1212' }}>Home</Link>
-        <Link to="/Calories" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Caloric Counter</Link>
-        <Link to="/workout" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Workout Log</Link>
         <Link to="/calc" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Caloric Calculator</Link>
+        <Link to="/workout" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Workout Log</Link>
+        <Link to="/Calories" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Caloric Counter</Link>
         <Link to="/profile" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Profile</Link>
         {isAuthenticated ? (
           <button 
