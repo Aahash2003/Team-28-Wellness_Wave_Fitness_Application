@@ -68,7 +68,6 @@ class CaloriePage extends Component {
       });
     } catch (error) {
       console.error('Error fetching remaining calories and macros:', error);
-      alert('Error fetching remaining calories and macros');
     }
   };
 

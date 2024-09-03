@@ -33,7 +33,7 @@ const LogCalories = ({ selectedDate, onLogSuccess }) => {
         fats,
       });
 
-      alert(response.data);
+      console.log(response.data);
       setCalories(''); // Clear the form fields
       setProtein('');
       setCarbohydrates('');
@@ -41,7 +41,7 @@ const LogCalories = ({ selectedDate, onLogSuccess }) => {
       onLogSuccess(); 
     } catch (error) {
       console.error(error);
-      alert('Error logging calories');
+      console.log('Error logging calories');
     }
   };
 

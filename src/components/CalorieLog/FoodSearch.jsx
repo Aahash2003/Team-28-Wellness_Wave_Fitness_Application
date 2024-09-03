@@ -18,7 +18,7 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
       setMacros(response.data);
     } catch (error) {
       console.error(error);
-      alert('Error fetching macro information');
+      console.log('Error fetching macro information');
     }
   };
 
@@ -43,11 +43,11 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
           fats: macros.fats,
           servings
         });
-        alert('Food item logged successfully');
+        console.log('Food item logged successfully');
         onFoodSuccess();
       } catch (error) {
         console.error(error);
-        alert('Error logging food item');
+        console.log('Error logging food item');
       }
     }
   };
