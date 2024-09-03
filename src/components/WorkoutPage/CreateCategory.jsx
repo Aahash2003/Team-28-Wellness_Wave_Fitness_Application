@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import image from './Equipment Sign.png'; // Replace with your designated image path
+import {Alert, AlertIcon,} from '@chakra-ui/react';
 
 const email = localStorage.getItem('email');
 

@@ -6,6 +6,7 @@ import CreateCategory from './CreateCategory';
 import CategoryCard from './CategoryCard';
 import HorizontalScrollbar from './HorizontalScrollBar';
 import './Workout.css'; // Import the CSS file for styling
+import {Alert, AlertIcon,} from '@chakra-ui/react';
 import { Stack } from '@mui/material';
 const baseURL = process.env.NODE_ENV === 'development'
     ? 'http://localhost:8080/'
