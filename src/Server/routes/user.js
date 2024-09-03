@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
             token: crypto.randomBytes(32).toString("hex"),
         }).save();
 
-        const url = `https://habits-development.netlify.app/users/${user._id}/verify/${token.token}`;
+        const url = `https://mustang-central-eb5dd97b4796.herokuapp.com/api/users/${user._id}/verify/${token.token}`;
         await sendEmail(user.email, "Verify Email", url);
 
         res.status(201).send({ message: "An email was sent to your account. Please verify." });
