@@ -69,7 +69,6 @@ const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
           value={servings}
           onChange={(e) => setServings(e.target.value)}
           required
-          min="1"
         />
         <button type="submit">Search</button>
       </form>

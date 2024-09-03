@@ -241,6 +241,33 @@ return (
           {error}
         </Alert>
       )}
+       <h2>Your Workouts for {date.toDateString()}</h2>
+    {workouts.length > 0 ? (
+      <ul className="workout-list">
+        {workouts.map((workout) => {
+          const workoutDate = new Date(workout.date).toLocaleDateString();
+          const selectedDate = date.toLocaleDateString();
+
+          if (workoutDate === selectedDate) {
+            return (
+              <li key={workout._id}>
+                <ul>
+                  {workout.exercises.map((exercise, index) => (
+                    <li key={index}>
+                      {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            );
+          } else {
+            return null;
+          }
+        })}
+      </ul>
+    ) : (
+      <p>No workouts logged for this date.</p>
+    )}
     <h2>{date.toDateString()}</h2>
     <Calendar onChange={onDateChange} value={date} />
 
@@ -338,33 +365,7 @@ return (
       {selectedWorkout ? 'Update Workout' : 'Log Workout'} for {date.toDateString()}
     </button>
 
-    <h2>Your Workouts for {date.toDateString()}</h2>
-    {workouts.length > 0 ? (
-      <ul className="workout-list">
-        {workouts.map((workout) => {
-          const workoutDate = new Date(workout.date).toLocaleDateString();
-          const selectedDate = date.toLocaleDateString();
-
-          if (workoutDate === selectedDate) {
-            return (
-              <li key={workout._id}>
-                <ul>
-                  {workout.exercises.map((exercise, index) => (
-                    <li key={index}>
-                      {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            );
-          } else {
-            return null;
-          }
-        })}
-      </ul>
-    ) : (
-      <p>No workouts logged for this date.</p>
-    )}
+   
   </div>
 );
 
