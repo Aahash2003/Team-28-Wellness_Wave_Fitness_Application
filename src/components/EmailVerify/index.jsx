@@ -24,6 +24,7 @@ const EmailVerify = () => {
 				setValidUrl(true);
 
 				window.location.href = "https://habits-development.netlify.app/login";
+				console.log("Redirect")
 
 
 			} catch (error) {
