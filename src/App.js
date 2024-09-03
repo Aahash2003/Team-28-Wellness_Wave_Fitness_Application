@@ -40,7 +40,7 @@ const App = () => {
           <Route path="/workout" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
-          <Route path="/users/:id/verify/:token" element={<EmailVerify />} />
+          <Route path="api/users/:id/verify/:token" element={<EmailVerify />} />
           <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <Navigate replace to="/home" /> : <WorkoutLogger />} />
           <Route
             path="/profile"
