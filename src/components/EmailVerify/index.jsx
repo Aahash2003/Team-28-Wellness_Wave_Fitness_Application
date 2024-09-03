@@ -25,7 +25,7 @@ const EmailVerify = () => {
 
 				// Redirect to login page after 3 seconds
 				setTimeout(() => {
-					navigate("/login");
+					window.location.href = "https://habits-development.netlify.app/login";
 				}, 1000);
 
 			} catch (error) {
