@@ -19,13 +19,19 @@ import CalorieCalc from './components/CalorieCalculator/CalorieCalc';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);  // Add loading state
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       setIsAuthenticated(true);
     }
+    setLoading(false);  // Set loading to false once the authentication check is done
   }, []);
+
+  if (loading) {
+    return null;  // Render nothing (or a spinner) while loading
+  }
 
   return (
     <Box className="app-container">
