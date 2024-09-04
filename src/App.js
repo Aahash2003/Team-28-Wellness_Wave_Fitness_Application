@@ -35,13 +35,12 @@ const App = () => {
           <Route path="/" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
           <Route path="/home" element={isAuthenticated ? <Home /> : <Navigate replace to="/login" />} />
           <Route path="/exercise/:id" element={isAuthenticated ? <ExerciseDetail /> : <Navigate replace to="/login" />} />
-          <Route path="/#exercises" element={isAuthenticated ? <ExerciseDetail /> : <Navigate replace to="/login" />} />
           <Route path="/Calories" element={isAuthenticated ? <CaloriePage /> : <Navigate replace to="/login" />} />
           <Route path="/workout" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
           <Route path="api/users/:id/verify/:token" element={<EmailVerify />} />
-          <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <Navigate replace to="/home" /> : <WorkoutLogger />} />
+          <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <WorkoutLogger /> : <Navigate replace to="/login" />} />
           <Route
             path="/profile"
             element={
