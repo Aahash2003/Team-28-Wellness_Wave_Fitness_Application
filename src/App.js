@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { ChakraProvider } from '@chakra-ui/react';
+import axios from 'axios';
 
 import './App.css';
 import ExerciseDetail from './pages/ExerciseDetail';
@@ -12,25 +13,36 @@ import Signup from './components/Signup';
 import Login from './components/Login';
 import EmailVerify from './components/EmailVerify';
 import WorkoutLog from './components/WorkoutPage/workout';
-import WorkoutLogger from './components/WorkoutPage/workout';
 import CaloriePage from './components/CalorieLog/CaloriePage';
 import Profile from './components/profile/Profile';
 import CalorieCalc from './components/CalorieCalculator/CalorieCalc';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);  // Add loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      setIsAuthenticated(true);
+      // Fetch user data to verify the token
+      axios.get('/api/verifyToken', { headers: { Authorization: `Bearer ${token}` } })
+        .then(response => {
+          setIsAuthenticated(true);
+        })
+        .catch(error => {
+          console.error('Token verification failed', error);
+          setIsAuthenticated(false);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
     }
-    setLoading(false);  // Set loading to false once the authentication check is done
   }, []);
 
   if (loading) {
-    return null;  // Render nothing (or a spinner) while loading
+    return null; // Or a loading spinner
   }
 
   return (
@@ -46,7 +58,7 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
           <Route path="api/users/:id/verify/:token" element={<EmailVerify />} />
-          <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <WorkoutLogger /> : <Navigate replace to="/login" />} />
+          <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
           <Route
             path="/profile"
             element={
