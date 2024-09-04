@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { ChakraProvider } from '@chakra-ui/react';
-import axios from 'axios';
 
 import './App.css';
 import ExerciseDetail from './pages/ExerciseDetail';
@@ -13,48 +12,25 @@ import Signup from './components/Signup';
 import Login from './components/Login';
 import EmailVerify from './components/EmailVerify';
 import WorkoutLog from './components/WorkoutPage/workout';
+import WorkoutLogger from './components/WorkoutPage/workout';
 import CaloriePage from './components/CalorieLog/CaloriePage';
 import Profile from './components/profile/Profile';
 import CalorieCalc from './components/CalorieCalculator/CalorieCalc';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);  // Add loading state
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('userId');
-
-    if (token && userId) {
-      axios.get(`/api/users/${userId}/verify/${token}/`)
-        .then(response => {
-          setIsAuthenticated(true);
-        })
-        .catch(error => {
-          console.error('Token verification failed', error);
-          setIsAuthenticated(false);
-          localStorage.removeItem('token');
-          localStorage.removeItem('userId');
-          navigate('/login');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
+    if (token) {
+      setIsAuthenticated(true);
     }
-  }, [navigate]);
-
-  const handleLogin = (token, userId) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('userId', userId);
-    setIsAuthenticated(true);
-    navigate('/home'); // Redirect after successful login
-  };
+    setLoading(false);  // Set loading to false once the authentication check is done
+  }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Show a loading state while checking auth status
+    return null;  // Render nothing (or a spinner) while loading
   }
 
   return (
@@ -68,9 +44,12 @@ const App = () => {
           <Route path="/Calories" element={isAuthenticated ? <CaloriePage /> : <Navigate replace to="/login" />} />
           <Route path="/workout" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
           <Route path="api/users/:id/verify/:token" element={<EmailVerify />} />
-          <Route path="/profile" element={
+          <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <WorkoutLogger /> : <Navigate replace to="/login" />} />
+          <Route
+            path="/profile"
+            element={
               isAuthenticated ? (
                 <ChakraProvider>
                   <Profile />
@@ -80,7 +59,9 @@ const App = () => {
               )
             }
           />
-          <Route path="/calc" element={
+          <Route
+            path="/calc"
+            element={
               isAuthenticated ? (
                 <ChakraProvider>
                   <CalorieCalc />
