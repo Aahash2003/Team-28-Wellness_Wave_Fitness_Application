@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate, useNavigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { ChakraProvider } from '@chakra-ui/react';
 import axios from 'axios';
@@ -20,18 +20,23 @@ import CalorieCalc from './components/CalorieCalculator/CalorieCalc';
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      // Fetch user data to verify the token
-      axios.get('/api/verifyToken', { headers: { Authorization: `Bearer ${token}` } })
+    const userId = localStorage.getItem('userId');
+
+    if (token && userId) {
+      axios.get(`/api/users/${userId}/verify/${token}/`)
         .then(response => {
           setIsAuthenticated(true);
         })
         .catch(error => {
           console.error('Token verification failed', error);
           setIsAuthenticated(false);
+          localStorage.removeItem('token');
+          localStorage.removeItem('userId');
+          navigate('/login');
         })
         .finally(() => {
           setLoading(false);
@@ -39,10 +44,17 @@ const App = () => {
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [navigate]);
+
+  const handleLogin = (token, userId) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('userId', userId);
+    setIsAuthenticated(true);
+    navigate('/home'); // Redirect after successful login
+  };
 
   if (loading) {
-    return null; // Or a loading spinner
+    return <div>Loading...</div>; // Show a loading state while checking auth status
   }
 
   return (
@@ -56,12 +68,9 @@ const App = () => {
           <Route path="/Calories" element={isAuthenticated ? <CaloriePage /> : <Navigate replace to="/login" />} />
           <Route path="/workout" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={isAuthenticated ? <Navigate replace to="/home" /> : <Login />} />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="api/users/:id/verify/:token" element={<EmailVerify />} />
-          <Route path="/api/workout/user/:email/workouts" element={isAuthenticated ? <WorkoutLog /> : <Navigate replace to="/login" />} />
-          <Route
-            path="/profile"
-            element={
+          <Route path="/profile" element={
               isAuthenticated ? (
                 <ChakraProvider>
                   <Profile />
@@ -71,9 +80,7 @@ const App = () => {
               )
             }
           />
-          <Route
-            path="/calc"
-            element={
+          <Route path="/calc" element={
               isAuthenticated ? (
                 <ChakraProvider>
                   <CalorieCalc />
