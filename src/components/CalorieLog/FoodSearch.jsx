@@ -8,7 +8,7 @@ const baseURL = process.env.NODE_ENV === 'development'
 const FoodSearch = ({ selectedDate, onFoodSuccess }) => {
   const [query, setQuery] = useState('');
   const [macros, setMacros] = useState(null);
-  const [servings, setServings] = useState(1); // New state for servings
+  const [servings, setServings] = useState(); // New state for servings
   const email = localStorage.getItem('email');
 
   const handleSearch = async (event) => {
