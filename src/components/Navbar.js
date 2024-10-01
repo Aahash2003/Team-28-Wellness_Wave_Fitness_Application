@@ -31,6 +31,7 @@ const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
         <Link to="/workout" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Workout Log</Link>
         <Link to="/Calories" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Caloric Counter</Link>
         <Link to="/profile" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Profile</Link>
+        <Link to="/AI" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>AI</Link>
         {isAuthenticated ? (
           <button 
             style={{

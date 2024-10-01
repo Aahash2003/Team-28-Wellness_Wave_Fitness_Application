@@ -20,6 +20,7 @@ app.use("/api/workout", require("./routes/workout"));
 app.use("/api/calories", require("./routes/calorie"));
 app.use("/api/calc", require("./routes/caloriecalc"));
 app.use("/api/profile", require("./routes/profile"));
+app.use("/api/AI", require("./routes/AI"));
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../../build'))); // Adjusted path to reflect typical project structure
