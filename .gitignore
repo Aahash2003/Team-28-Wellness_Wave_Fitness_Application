@@ -22,3 +22,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 ".env" 
+
+"src/Server/utils/.env" 
+".env" 
+"src/Server/utils/.env" 
