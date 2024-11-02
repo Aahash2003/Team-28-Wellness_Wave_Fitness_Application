@@ -3,7 +3,10 @@ const cors = require('cors');
 require('../Server/db');
 require('mongoose');
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'https://habits-development.netlify.app'
+}));
+
 app.use(express.json());
 app.use('/', express.static('../src'));
 
