@@ -11,7 +11,10 @@ connection();
 
 // Middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'https://habits-development.netlify.app'
+}));
+
 
 // API Routes
 app.use("/api/users", require("./routes/user"));
