@@ -111,7 +111,7 @@ router.get('/macros', async (req, res) => {
 
       // Search for the food item
       const searchResponse = await axios.get(
-          `https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=${process.env.USDA_API_KEY}`
+          `https://api.nal.usda.gov/fdc/v1/foods/search?query=${query}&api_key=j07UkMdpgefCeoneKv36ShPbIy1KCJZc039RFH1T`
       );
 
       if (searchResponse.data.foods.length === 0) {
@@ -123,7 +123,7 @@ router.get('/macros', async (req, res) => {
 
       // Get detailed information about the food item
       const foodResponse = await axios.get(
-          `https://api.nal.usda.gov/fdc/v1/food/${foodId}?api_key=${process.env.USDA_API_KEY}`
+          `https://api.nal.usda.gov/fdc/v1/food/${foodId}?api_key=j07UkMdpgefCeoneKv36ShPbIy1KCJZc039RFH1T`
       );
 
       const nutrients = foodResponse.data.foodNutrients;
