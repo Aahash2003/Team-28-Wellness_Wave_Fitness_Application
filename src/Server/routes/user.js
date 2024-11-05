@@ -51,9 +51,9 @@ router.get("/:id/verify/:token/", async (req, res) => {
         if (!token) {res.redirect('https://habits-development.netlify.app');
             console.log(console.log("Token Issue"));
         };
-
+        if(user && token) {
         res.redirect('https://habits-development.netlify.app');
-
+        }
         await User.updateOne({ _id: user._id }, { $set: { verified: true } });
         await Token.deleteOne({ _id: token._id });
 
