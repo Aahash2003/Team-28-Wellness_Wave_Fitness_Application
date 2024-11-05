@@ -8,13 +8,13 @@ service :"gmail",
 email : 465,
 secure : true,
 			auth: {
-				user: "saahash1234@gmail.com",
-				pass: "fpan kyuq jecf njcq",
+				user: process.env.USER,
+				pass: process.env.PASS,
 			},
             
 		});
 		await transporter.sendMail({
-			from: process.env.USER,
+			from: `"Habits Development" <saahash1234@gmail.com>`,
 			to: email,
 			subject: subject,
 			text: text,
