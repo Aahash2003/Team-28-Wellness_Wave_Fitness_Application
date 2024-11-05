@@ -14,7 +14,7 @@ secure : true,
             
 		});
 		await transporter.sendMail({
-			from: `"Habits Development" <saahash1234@gmail.com>`,
+			from: "Habits Development",
 			to: email,
 			subject: subject,
 			text: text,
