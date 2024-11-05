@@ -48,8 +48,8 @@ router.get("/:id/verify/:token/", async (req, res) => {
             userId: user._id,
             token: req.params.token,
         });
-        if (!token) {res.redirect('https://habits-development.netlify.app')
-            console.log(console.log("Token Issue"))
+        if (!token) {res.redirect('https://habits-development.netlify.app');
+            console.log(console.log("Token Issue"));
         };
 
         res.redirect('https://habits-development.netlify.app');
