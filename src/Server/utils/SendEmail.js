@@ -8,8 +8,8 @@ service :"gmail",
 email : 465,
 secure : true,
 			auth: {
-				user: process.env.USER,
-				pass: process.env.PASS,
+				user: "saahash1234@gmail.com",
+				pass: "fpan kyuq jecf njcq",
 			},
             
 		});
