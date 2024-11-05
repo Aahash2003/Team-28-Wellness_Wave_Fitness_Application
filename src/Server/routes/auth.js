@@ -80,7 +80,7 @@ router.post('/resend-verification', async (req, res) => {
         }
 
         // Send the verification email
-        const url = `${process.env.BASE_URL}users/${user.id}/verify/${token.token}`;
+        const url = `${process.env.BASE_URL}api/users/${user.id}/verify/${token.token}`;
 		console.log("URL: " + url)
         await sendEmail(user.email, "Verify Email", url);
 
