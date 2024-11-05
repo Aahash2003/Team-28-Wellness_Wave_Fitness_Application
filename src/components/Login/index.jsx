@@ -34,7 +34,13 @@ const Login = () => {
                 navigate("/"); // Redirect to main page if verified
             }
         } catch (error) {
-            if (error.response && error.response.status >= 400 && error.response.status <= 500) {
+            if (error.response && error.response.status == 400){
+                setError("Check Verification Link");
+                setResend(false);
+
+            }
+
+            if (error.response && error.response.status > 400 && error.response.status <= 500) {
                 setError(error.response.data.message);
                 setResend(false);
             }
