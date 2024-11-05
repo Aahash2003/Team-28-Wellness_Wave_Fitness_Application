@@ -40,6 +40,7 @@ router.post("/", async (req, res) => {
 
 router.get("/:id/verify/:token/", async (req, res) => {
     try {
+        
         const user = await User.findOne({ _id: req.params.id });
         if (!user) return res.status(400).send({ message: "Invalid link" });
 
@@ -47,7 +48,11 @@ router.get("/:id/verify/:token/", async (req, res) => {
             userId: user._id,
             token: req.params.token,
         });
-        if (!token) return res.status(400).send({ message: "Invalid link" });
+        if (!token) {res.redirect('https://habits-development.netlify.app')
+            console.log(console.log("Token Issue"))
+        };
+
+        res.redirect('https://habits-development.netlify.app');
 
         await User.updateOne({ _id: user._id }, { $set: { verified: true } });
         await Token.deleteOne({ _id: token._id });
