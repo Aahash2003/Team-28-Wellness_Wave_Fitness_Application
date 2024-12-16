@@ -1,11 +1,12 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Stack } from '@mui/material';
 
 import Logo from '../Assets/Logo/Logo3.png';
 
 const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
   const navigate = useNavigate(); // Initialize the navigate function
+  const location = useLocation(); // Get the current location
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -14,6 +15,8 @@ const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
     setIsAuthenticated(false);  // Update authentication state
     window.location.href = "https://habits-development.netlify.app"; // Redirect to the base page
   };
+
+  const isActive = (path) => location.pathname === path; // Check if the path is active
 
   return (
     <Stack
@@ -26,47 +29,62 @@ const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
         <img src={Logo} alt="logo" style={{ width: '48px', height: '48px', margin: '10px' }} />
       </Link>
       <Stack alignItems="center" direction="row" gap="40px" fontSize="24px">
-        <Link to="/home" style={{ textDecoration: 'none', color: '#3A1212', borderBottom: '3px solid #3A1212' }}>Home</Link>
-        <Link to="/calc" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Caloric Calculator</Link>
-        <Link to="/workout" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Workout Log</Link>
-        <Link to="/Calories" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Caloric Counter</Link>
-        <Link to="/profile" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>Profile</Link>
-        <Link to="/AI" style={{ textDecoration: 'none', color: '#3A1212', margin: '0px' }}>AI</Link>
-        {isAuthenticated ? (
-          <button 
+        {[
+          { path: "/home", label: "Home" },
+          { path: "/calc", label: "Caloric Calculator" },
+          { path: "/workout", label: "Workout Log" },
+          { path: "/Calories", label: "Caloric Counter" },
+          { path: "/profile", label: "Profile" },
+          { path: "/AI", label: "AI" },
+        ].map((link) => (
+          <Link
+            key={link.path}
+            to={link.path}
             style={{
-              border: 'none', 
-              outline: 'none', 
-              padding: '12px', 
-              backgroundColor: 'white', 
-              borderRadius: '20px', 
+              textDecoration: 'none',
+              color: '#3A1212',
+              margin: '0px',
+              borderBottom: isActive(link.path) ? '3px solid #3A1212' : 'none', // Underline for active link
+            }}
+          >
+            {link.label}
+          </Link>
+        ))}
+        {isAuthenticated ? (
+          <button
+            style={{
+              border: 'none',
+              outline: 'none',
+              padding: '12px',
+              backgroundColor: 'white',
+              borderRadius: '20px',
               width: '120px',
               fontWeight: 'bold',
-              fontSize: '14px', 
-              cursor: 'pointer', 
-              marginRight: '20px'
-            }} 
+              fontSize: '14px',
+              cursor: 'pointer',
+              marginRight: '20px',
+            }}
             onClick={handleLogout}
           >
             Logout
           </button>
         ) : (
-          <Link 
+          <Link
             to="/login"
             style={{
-              textDecoration: 'none', 
-              color: '#3A1212', 
-              border: 'none', 
-              outline: 'none', 
-              padding: '12px', 
-              backgroundColor: 'white', 
-              borderRadius: '20px', 
+              textDecoration: 'none',
+              color: '#3A1212',
+              border: 'none',
+              outline: 'none',
+              padding: '12px',
+              backgroundColor: 'white',
+              borderRadius: '20px',
               width: '120px',
               fontWeight: 'bold',
-              fontSize: '14px', 
-              cursor: 'pointer', 
+              fontSize: '14px',
+              cursor: 'pointer',
               marginRight: '20px',
-              textAlign: 'center'
+              textAlign: 'center',
             }}
           >
             Login
