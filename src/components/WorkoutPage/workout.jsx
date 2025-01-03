@@ -6,7 +6,7 @@ import CreateCategory from './CreateCategory';
 import CategoryCard from './CategoryCard';
 import HorizontalScrollbar from './HorizontalScrollBar';
 import './Workout.css'; // Import the CSS file for styling
-import {Alert, AlertIcon,} from '@chakra-ui/react';
+import {Box, Heading, Input, Text, Button, Grid, Alert, AlertIcon,} from '@chakra-ui/react';
 import { Stack } from '@mui/material';
 const baseURL = process.env.NODE_ENV === 'development'
     ? 'http://localhost:8080/'
@@ -234,139 +234,162 @@ const filteredWorkouts = workoutsByCategory.filter(workout => {
 
 
 return (
-  <div className="container">
-     {error && (
+  <Box p={[4, 5]} maxW="1200px" mx="auto" overflowX="hidden">
+    <Heading as="h1" size="xl" mb={6} textAlign="center">
+      Your Workouts for {date.toDateString()}
+    </Heading>
+    <div className="container">
+      {error && (
         <Alert status="error" mb={4}>
           <AlertIcon />
           {error}
         </Alert>
       )}
-       <h2>Your Workouts for {date.toDateString()}</h2>
-    {workouts.length > 0 ? (
-      <ul className="workout-list">
-        {workouts.map((workout) => {
-          const workoutDate = new Date(workout.date).toLocaleDateString();
-          const selectedDate = date.toLocaleDateString();
 
-          if (workoutDate === selectedDate) {
-            return (
-              <li key={workout._id}>
-                <ul>
-                  {workout.exercises.map((exercise, index) => (
-                    <li key={index}>
-                      {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            );
-          } else {
+      {workouts.length > 0 ? (
+        <Box as="ul" className="workout-list" mb={6}>
+          {workouts.map((workout) => {
+            const workoutDate = new Date(workout.date).toLocaleDateString();
+            const selectedDate = date.toLocaleDateString();
+
+            if (workoutDate === selectedDate) {
+              return (
+                <Box as="li" key={workout._id} mb={4}>
+                  <Heading as="h3" size="md" mb={2}>
+                    Exercises:
+                  </Heading>
+                  <Box as="ul" pl={4}>
+                    {workout.exercises.map((exercise, index) => (
+                      <Text key={index} fontSize="sm">
+                        {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
+                      </Text>
+                    ))}
+                  </Box>
+                </Box>
+              );
+            }
             return null;
-          }
-        })}
-      </ul>
-    ) : (
-      <p>No workouts logged for this date.</p>
-    )}
-    <h2>{date.toDateString()}</h2>
-    <Calendar onChange={onDateChange} value={date} />
+          })}
+        </Box>
+      ) : (
+        <Text fontSize="lg" textAlign="center">
+          No workouts logged for this date.
+        </Text>
+      )}
 
-    <CreateCategory 
-      onCategoryCreated={onCategoryCreated} 
-      categories={categories} 
-      handleDeleteCategory={handleDeleteCategory} 
-    />
+      <Text fontSize="lg" fontWeight="semibold" mt={6} textAlign="center">
+        {date.toDateString()}
+      </Text>
+      <Box my={4}>
+        <Calendar onChange={onDateChange} value={date} />
+      </Box>
 
-    <div className="category-selection">
-      <HorizontalScrollbar
+      <CreateCategory
+        onCategoryCreated={onCategoryCreated}
         categories={categories}
-        handleCategoryChange={handleCategoryChange}
-        selectedCategory={selectedCategory}
-        handleDeleteCategory={handleDeleteCategory}  // Pass handleDeleteCategory to HorizontalScrollbar
+        handleDeleteCategory={handleDeleteCategory}
       />
-    </div>
 
-    {workoutsByCategory.length > 0 && (
-      <div>
-        <h3>Workouts in Selected Category</h3>
-        <ul className="workout-list">
-          {workoutsByCategory.map((workout) => (
-            <li key={workout._id}>
-              <strong>{workout.exercises.map(e => e.name).join(', ')}</strong>
-              <button onClick={() => handleWorkoutSelect(workout._id)}>Edit Workout</button>
-              <ul>
-                {workout.exercises.map((exercise, index) => (
-                  <li key={index}>
-                    {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </div>
-    )}
+      <Box className="category-selection" my={4}>
+        <HorizontalScrollbar
+          categories={categories}
+          handleCategoryChange={handleCategoryChange}
+          selectedCategory={selectedCategory}
+          handleDeleteCategory={handleDeleteCategory}
+        />
+      </Box>
 
-    <h3>Exercises</h3>
-    {exercises.map((exercise, index) => (
-      <div key={index} className="exercise-container">
-        <input
+      {workoutsByCategory.length > 0 && (
+        <Box mb={6}>
+          <Heading as="h3" size="md" mb={2}>
+            Workouts in Selected Category
+          </Heading>
+          <Box as="ul" pl={4}>
+            {workoutsByCategory.map((workout) => (
+              <Box as="li" key={workout._id} mb={4}>
+                <strong>{workout.exercises.map((e) => e.name).join(', ')}</strong>
+                <Button size="sm" mt={2} onClick={() => handleWorkoutSelect(workout._id)}>
+                  Edit Workout
+                </Button>
+                <Box as="ul" pl={4}>
+                  {workout.exercises.map((exercise, index) => (
+                    <Text key={index} fontSize="sm">
+                      {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
+                    </Text>
+                  ))}
+                </Box>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      )}
+
+      <Heading as="h3" size="md" my={4}>
+        Exercises
+      </Heading>
+      {exercises.map((exercise, index) => (
+  <Box key={index} className="exercise-container" p={4} borderWidth="1px" borderRadius="lg" mb={4}>
+    <Grid templateColumns={['1fr', 'repeat(2, 1fr)']} gap={4} alignItems="center">
+      <Input
+        type="text"
+        placeholder="Exercise Name"
+        value={exercise.name}
+        onChange={(e) => handleExerciseChange(index, 'name', e.target.value)}
+      />
+      <Input
+        type="number"
+        placeholder="Sets"
+        value={exercise.sets}
+        onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
+      />
+      <Input
+        type="number"
+        placeholder="Reps"
+        value={exercise.reps}
+        onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
+      />
+      <Input
+        type="number"
+        placeholder="Weight (LBS)"
+        value={exercise.weight}
+        onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)}
+      />
+      <Input
+        type="number"
+        placeholder="Rest Time (s)"
+        value={exercise.restTime}
+        onChange={(e) => handleExerciseChange(index, 'restTime', e.target.value)}
+      />
+      <Input
+        type="number"
+        placeholder="Current Rep Max (LBS)"
+        value={exercise.currentRepMax}
+        onChange={(e) => handleExerciseChange(index, 'currentRepMax', e.target.value)}
+      />
+      <Box display="flex" alignItems="center">
+        <Input
           type="text"
-          placeholder="Exercise Name"
-          value={exercise.name}
-          onChange={(e) => handleExerciseChange(index, 'name', e.target.value)}
+          placeholder="One Rep Max (LBS)"
+          value={exercise.oneRepMax}
+          readOnly
         />
-        <input
-          type="number"
-          placeholder="Sets"
-          value={exercise.sets}
-          onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Reps"
-          value={exercise.reps}
-          onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Weight"
-          value={exercise.weight}
-          onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Rest Time"
-          value={exercise.restTime}
-          onChange={(e) => handleExerciseChange(index, 'restTime', e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Current Rep Max"
-          value={exercise.currentRepMax}
-          onChange={(e) => handleExerciseChange(index, 'currentRepMax', e.target.value)}
-        />
-        <div className="one-rep-max-container">
-          <input
-            type="text"
-            placeholder="One Rep Max"
-            value={exercise.oneRepMax}
-            readOnly
-          />
-          <span className="one-rep-max-label">LBS</span>
-        </div>
-        {exercises.length > 1 && (
-          <button onClick={() => handleRemoveExercise(index)}>Remove Exercise</button>
-        )}
-      </div>
-    ))}
+        <Text ml={2}>LBS</Text>
+      </Box>
+    </Grid>
+    {exercises.length > 1 && (
+      <Button mt={4} colorScheme="red" size="sm" onClick={() => handleRemoveExercise(index)}>
+        Remove Exercise
+      </Button>
+    )}
+  </Box>
+))}
 
-    <button onClick={handleLogWorkout}>
-      {selectedWorkout ? 'Update Workout' : 'Log Workout'} for {date.toDateString()}
-    </button>
 
-   
-  </div>
+      <Button colorScheme="teal" mt={4} onClick={handleLogWorkout} width="100%">
+        {selectedWorkout ? 'Update Workout' : 'Log Workout'} for {date.toDateString()}
+      </Button>
+    </div>
+  </Box>
 );
 
 
