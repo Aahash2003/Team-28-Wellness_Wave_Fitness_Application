@@ -234,57 +234,74 @@ const filteredWorkouts = workoutsByCategory.filter(workout => {
 
 
 return (
-  <Box p={[4, 5]} maxW="1200px" mx="auto" overflowX="hidden">
+  <Box p={[4, 5]} maxW="100%" mx="auto" overflowX="hidden">
     <Heading as="h1" size="xl" mb={6} textAlign="center">
       Your Workouts for {date.toDateString()}
     </Heading>
-    <Box className="container">
-      {error && (
-        <Alert status="error" mb={4}>
-          <AlertIcon />
-          {error}
-        </Alert>
-      )}
 
-      {workouts.length > 0 ? (
-        <Box as="ul" className="workout-list" mb={6}>
-          {workouts.map((workout) => {
-            const workoutDate = new Date(workout.date).toLocaleDateString();
-            const selectedDate = date.toLocaleDateString();
+    {error && (
+      <Alert status="error" mb={4}>
+        <AlertIcon />
+        {error}
+      </Alert>
+    )}
 
-            if (workoutDate === selectedDate) {
-              return (
-                <Box as="li" key={workout._id} mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="sm">
-                  <Heading as="h3" size="md" mb={2}>
-                    Exercises:
-                  </Heading>
-                  <Box as="ul" pl={4}>
-                    {workout.exercises.map((exercise, index) => (
-                      <Text key={index} fontSize="sm">
-                        {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
-                      </Text>
-                    ))}
-                  </Box>
-                </Box>
-              );
-            }
-            return null;
-          })}
-        </Box>
-      ) : (
-        <Text fontSize="lg" textAlign="center">
-          No workouts logged for this date.
-        </Text>
-      )}
+{workouts.length > 0 ? (
+  <Box as="ul" mb={6}>
+    {workouts.map((workout) => {
+      const workoutDate = new Date(workout.date).toLocaleDateString();
+      const selectedDate = date.toLocaleDateString();
 
-      <Text fontSize="lg" fontWeight="semibold" mt={6} textAlign="center">
-        {date.toDateString()}
-      </Text>
-      <Box my={4} w="100%">
-        <Calendar onChange={onDateChange} value={date} />
-      </Box>
+      if (workoutDate === selectedDate) {
+        return (
+          <Box
+            as="li"
+            key={workout._id}
+            mb={4}
+            p={4}
+            borderWidth="1px"
+            borderRadius="md"
+            boxShadow="sm"
+            bg="#fff"
+            transition="transform 0.3s, box-shadow 0.3s"
+            _hover={{
+              transform: 'scale(1.02)',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <Heading as="h3" size="md" mb={2}>
+              Exercises:
+            </Heading>
+            <Box as="ul" pl={4}>
+              {workout.exercises.map((exercise, index) => (
+                <Text key={index} fontSize="sm">
+                  {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
+                </Text>
+              ))}
+            </Box>
+          </Box>
+        );
+      }
+      return null;
+    })}
+  </Box>
+) : (
+  <Text fontSize="lg" textAlign="center">
+    No workouts logged for this date.
+  </Text>
+)}
 
-      <Box my={4}>
+
+    <Text fontSize="lg" fontWeight="semibold" mt={6} textAlign="center">
+      {date.toDateString()}
+    </Text>
+
+    <Box mb={6} w="100%">
+      <Calendar onChange={onDateChange} value={date} />
+    </Box>
+
+    <VStack spacing={6} w="100%">
+      <Box w="100%" p={5} borderWidth="1px" borderRadius="md" boxShadow="md">
         <CreateCategory
           onCategoryCreated={onCategoryCreated}
           categories={categories}
@@ -292,7 +309,7 @@ return (
         />
       </Box>
 
-      <Box my={4} className="category-selection">
+      <Box w="100%" p={5} borderWidth="1px" borderRadius="md" boxShadow="md">
         <HorizontalScrollbar
           categories={categories}
           handleCategoryChange={handleCategoryChange}
@@ -302,13 +319,13 @@ return (
       </Box>
 
       {workoutsByCategory.length > 0 && (
-        <Box mb={6}>
+        <Box w="100%" mb={6} p={5} borderWidth="1px" borderRadius="md" boxShadow="md">
           <Heading as="h3" size="md" mb={2}>
             Workouts in Selected Category
           </Heading>
           <Box as="ul" pl={4}>
             {workoutsByCategory.map((workout) => (
-              <Box as="li" key={workout._id} mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="sm">
+              <Box as="li" key={workout._id} mb={4}>
                 <strong>{workout.exercises.map((e) => e.name).join(', ')}</strong>
                 <Button size="sm" mt={2} onClick={() => handleWorkoutSelect(workout._id)}>
                   Edit Workout
@@ -316,7 +333,8 @@ return (
                 <Box as="ul" pl={4}>
                   {workout.exercises.map((exercise, index) => (
                     <Text key={index} fontSize="sm">
-                      {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
+                      {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS,
+                      Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
                     </Text>
                   ))}
                 </Box>
@@ -325,13 +343,15 @@ return (
           </Box>
         </Box>
       )}
+    </VStack>
 
+    <VStack spacing={6} w="100%">
       <Heading as="h3" size="md" my={4}>
         Exercises
       </Heading>
       {exercises.map((exercise, index) => (
-        <Box key={index} className="exercise-container" p={4} borderWidth="1px" borderRadius="lg" mb={4}>
-          <Grid templateColumns={['1fr', 'repeat(2, 1fr)']} gap={4} alignItems="center">
+        <Box key={index} w="100%" p={5} borderWidth="1px" borderRadius="md" boxShadow="md">
+          <VStack spacing={4}>
             <Input
               type="text"
               placeholder="Exercise Name"
@@ -374,17 +394,14 @@ return (
               onChange={(e) => handleExerciseChange(index, 'currentRepMax', e.target.value)}
               w="100%"
             />
-            <Box display="flex" alignItems="center" w="100%">
-              <Input
-                type="text"
-                placeholder="One Rep Max (LBS)"
-                value={exercise.oneRepMax}
-                readOnly
-                w="100%"
-              />
-              <Text ml={2}>LBS</Text>
-            </Box>
-          </Grid>
+            <Input
+              type="text"
+              placeholder="One Rep Max (LBS)"
+              value={exercise.oneRepMax}
+              readOnly
+              w="100%"
+            />
+          </VStack>
           {exercises.length > 1 && (
             <Button mt={4} colorScheme="red" size="sm" onClick={() => handleRemoveExercise(index)} w="100%">
               Remove Exercise
@@ -392,13 +409,14 @@ return (
           )}
         </Box>
       ))}
+    </VStack>
 
-      <Button colorScheme="teal" mt={4} onClick={handleLogWorkout} w="100%">
-        {selectedWorkout ? 'Update Workout' : 'Log Workout'} for {date.toDateString()}
-      </Button>
-    </Box>
+    <Button colorScheme="teal" mt={4} onClick={handleLogWorkout} w="100%">
+      {selectedWorkout ? 'Update Workout' : 'Log Workout'} for {date.toDateString()}
+    </Button>
   </Box>
 );
+
 
 
 
