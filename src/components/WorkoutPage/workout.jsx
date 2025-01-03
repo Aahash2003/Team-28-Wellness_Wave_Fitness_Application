@@ -238,7 +238,7 @@ return (
     <Heading as="h1" size="xl" mb={6} textAlign="center">
       Your Workouts for {date.toDateString()}
     </Heading>
-    <div className="container">
+    <Box className="container">
       {error && (
         <Alert status="error" mb={4}>
           <AlertIcon />
@@ -254,7 +254,7 @@ return (
 
             if (workoutDate === selectedDate) {
               return (
-                <Box as="li" key={workout._id} mb={4}>
+                <Box as="li" key={workout._id} mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="sm">
                   <Heading as="h3" size="md" mb={2}>
                     Exercises:
                   </Heading>
@@ -280,17 +280,19 @@ return (
       <Text fontSize="lg" fontWeight="semibold" mt={6} textAlign="center">
         {date.toDateString()}
       </Text>
-      <Box my={4}>
+      <Box my={4} w="100%">
         <Calendar onChange={onDateChange} value={date} />
       </Box>
 
-      <CreateCategory
-        onCategoryCreated={onCategoryCreated}
-        categories={categories}
-        handleDeleteCategory={handleDeleteCategory}
-      />
+      <Box my={4}>
+        <CreateCategory
+          onCategoryCreated={onCategoryCreated}
+          categories={categories}
+          handleDeleteCategory={handleDeleteCategory}
+        />
+      </Box>
 
-      <Box className="category-selection" my={4}>
+      <Box my={4} className="category-selection">
         <HorizontalScrollbar
           categories={categories}
           handleCategoryChange={handleCategoryChange}
@@ -306,7 +308,7 @@ return (
           </Heading>
           <Box as="ul" pl={4}>
             {workoutsByCategory.map((workout) => (
-              <Box as="li" key={workout._id} mb={4}>
+              <Box as="li" key={workout._id} mb={4} p={4} borderWidth="1px" borderRadius="md" boxShadow="sm">
                 <strong>{workout.exercises.map((e) => e.name).join(', ')}</strong>
                 <Button size="sm" mt={2} onClick={() => handleWorkoutSelect(workout._id)}>
                   Edit Workout
@@ -328,69 +330,76 @@ return (
         Exercises
       </Heading>
       {exercises.map((exercise, index) => (
-  <Box key={index} className="exercise-container" p={4} borderWidth="1px" borderRadius="lg" mb={4}>
-    <Grid templateColumns={['1fr', 'repeat(2, 1fr)']} gap={4} alignItems="center">
-      <Input
-        type="text"
-        placeholder="Exercise Name"
-        value={exercise.name}
-        onChange={(e) => handleExerciseChange(index, 'name', e.target.value)}
-      />
-      <Input
-        type="number"
-        placeholder="Sets"
-        value={exercise.sets}
-        onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
-      />
-      <Input
-        type="number"
-        placeholder="Reps"
-        value={exercise.reps}
-        onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
-      />
-      <Input
-        type="number"
-        placeholder="Weight (LBS)"
-        value={exercise.weight}
-        onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)}
-      />
-      <Input
-        type="number"
-        placeholder="Rest Time (s)"
-        value={exercise.restTime}
-        onChange={(e) => handleExerciseChange(index, 'restTime', e.target.value)}
-      />
-      <Input
-        type="number"
-        placeholder="Current Rep Max (LBS)"
-        value={exercise.currentRepMax}
-        onChange={(e) => handleExerciseChange(index, 'currentRepMax', e.target.value)}
-      />
-      <Box display="flex" alignItems="center">
-        <Input
-          type="text"
-          placeholder="One Rep Max (LBS)"
-          value={exercise.oneRepMax}
-          readOnly
-        />
-        <Text ml={2}>LBS</Text>
-      </Box>
-    </Grid>
-    {exercises.length > 1 && (
-      <Button mt={4} colorScheme="red" size="sm" onClick={() => handleRemoveExercise(index)}>
-        Remove Exercise
-      </Button>
-    )}
-  </Box>
-))}
+        <Box key={index} className="exercise-container" p={4} borderWidth="1px" borderRadius="lg" mb={4}>
+          <Grid templateColumns={['1fr', 'repeat(2, 1fr)']} gap={4} alignItems="center">
+            <Input
+              type="text"
+              placeholder="Exercise Name"
+              value={exercise.name}
+              onChange={(e) => handleExerciseChange(index, 'name', e.target.value)}
+              w="100%"
+            />
+            <Input
+              type="number"
+              placeholder="Sets"
+              value={exercise.sets}
+              onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)}
+              w="100%"
+            />
+            <Input
+              type="number"
+              placeholder="Reps"
+              value={exercise.reps}
+              onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
+              w="100%"
+            />
+            <Input
+              type="number"
+              placeholder="Weight (LBS)"
+              value={exercise.weight}
+              onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)}
+              w="100%"
+            />
+            <Input
+              type="number"
+              placeholder="Rest Time (s)"
+              value={exercise.restTime}
+              onChange={(e) => handleExerciseChange(index, 'restTime', e.target.value)}
+              w="100%"
+            />
+            <Input
+              type="number"
+              placeholder="Current Rep Max (LBS)"
+              value={exercise.currentRepMax}
+              onChange={(e) => handleExerciseChange(index, 'currentRepMax', e.target.value)}
+              w="100%"
+            />
+            <Box display="flex" alignItems="center" w="100%">
+              <Input
+                type="text"
+                placeholder="One Rep Max (LBS)"
+                value={exercise.oneRepMax}
+                readOnly
+                w="100%"
+              />
+              <Text ml={2}>LBS</Text>
+            </Box>
+          </Grid>
+          {exercises.length > 1 && (
+            <Button mt={4} colorScheme="red" size="sm" onClick={() => handleRemoveExercise(index)} w="100%">
+              Remove Exercise
+            </Button>
+          )}
+        </Box>
+      ))}
 
-
-      <Button colorScheme="teal" mt={4} onClick={handleLogWorkout} width="100%">
+      <Button colorScheme="teal" mt={4} onClick={handleLogWorkout} w="100%">
         {selectedWorkout ? 'Update Workout' : 'Log Workout'} for {date.toDateString()}
       </Button>
-    </div>
+    </Box>
   </Box>
 );
+
 
 
 
