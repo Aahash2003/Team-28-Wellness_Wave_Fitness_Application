@@ -36,6 +36,7 @@ const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
           { path: "/Calories", label: "Caloric Counter" },
           { path: "/profile", label: "Profile" },
           { path: "/AI", label: "AI" },
+          { path: "/FitBit", label: "FitBit"},
         ].map((link) => (
           <Link
             key={link.path}
