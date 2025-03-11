@@ -26,6 +26,7 @@
     "joi-password-complexity": "^5.2.0",
     "jsonwebtoken": "^9.0.2",
     "legacy": "^0.0.3",
+    "moment-timezone": "^0.5.47",
     "mongodb": "^6.8.0",
     "mongoose": "^8.5.4",
     "node-polyfill-webpack-plugin": "^4.0.0",
