@@ -4,7 +4,9 @@ import image from './Equipment Sign.png';
 
 const email = localStorage.getItem('email');
 
-const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8080/';
+const baseURL = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8080/'
+    : 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
 
 const CreateCategory = ({ onCategoryCreated, categories, handleDeleteCategory }) => {
     const [categoryName, setCategoryName] = useState('');
