@@ -8,7 +8,7 @@ const baseURL = process.env.NODE_ENV === 'development'
     ? 'http://localhost:8080/'
     : 'https://mustang-central-eb5dd97b4796.herokuapp.com/';
 
-const CreateCategory = ({ onCategoryCreated, categories, handleDeleteCategory }) => {
+const CreateCategory = ({ onCategoryCreated, categories, handleDeleteCategory, onCategorySelect }) => {
     const [categoryName, setCategoryName] = useState('');
     const [description, setDescription] = useState('');
     const [error, setError] = useState('');
@@ -25,13 +25,13 @@ const CreateCategory = ({ onCategoryCreated, categories, handleDeleteCategory })
         }
 
         try {
-            const response = await axios.post(`${baseURL}api/workout/createCategory`, {
+            await axios.post(`${baseURL}api/workout/createCategory`, {
                 name: categoryName.trim(),
                 description: description.trim(),
                 imageUrl: image,
                 email,
             });
-            onCategoryCreated();
+            onCategoryCreated();  // Refresh categories after creation
             setCategoryName('');
             setDescription('');
         } catch (error) {
@@ -67,6 +67,23 @@ const CreateCategory = ({ onCategoryCreated, categories, handleDeleteCategory })
             >
                 Create Category
             </button>
+
+            <h3 className="text-lg font-bold mt-5">Categories</h3>
+            {categories.length === 0 ? (
+                <p>No categories available.</p>
+            ) : (
+                categories.map((category) => (
+                    <div
+                        key={category._id}
+                        className="bg-white p-4 border border-gray-300 rounded-lg shadow-md cursor-pointer hover:bg-gray-100"
+                        onClick={() => onCategorySelect(category._id)}  // Category click handler
+                    >
+                        <img src={category.imageUrl} alt={category.name} className="w-12 h-12 rounded-full mb-3" />
+                        <h4 className="font-semibold">{category.name}</h4>
+                        <p>{category.description}</p>
+                    </div>
+                ))
+            )}
         </div>
     );
 };

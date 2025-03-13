@@ -12,15 +12,73 @@ const getUserByEmail = async (email) => {
     return user;
 };
 
-router.post('/logWorkout', async (req, res) => {
-    const { email, exercises, categoryId, workoutId, date } = req.body;
+
+
+router.delete('/category/:categoryId/workout/:workoutId', async (req, res) => {
+    const { categoryId, workoutId } = req.params;
+    const { email } = req.body; // User's email for authorization
 
     try {
+        // Find the user by email
         const user = await getUserByEmail(email);
         if (!user) {
             return res.status(404).send('User not found');
         }
 
+        // Find the category by categoryId
+        const category = await WorkoutCategory.findById(categoryId);
+        if (!category) {
+            return res.status(404).send('Category not found');
+        }
+
+        // Ensure that the workout is part of this category
+        const workoutIndex = category.workouts.indexOf(workoutId);
+        if (workoutIndex === -1) {
+            return res.status(404).send('Workout not found in the specified category');
+        }
+
+        // Remove the workout from the category's workouts array
+        category.workouts.splice(workoutIndex, 1);
+        await category.save(); // Save the updated category
+
+        // Find and delete the workout from the Workout collection
+        const workout = await Workout.findById(workoutId);
+        if (!workout) {
+            return res.status(404).send('Workout not found');
+        }
+
+        // Ensure the workout belongs to the user
+        if (!workout.user.equals(user._id)) {
+            return res.status(403).send('You are not authorized to delete this workout');
+        }
+
+        // Delete the workout
+        await Workout.deleteOne({ _id: workoutId });
+
+        // Optionally, remove the workout from the user's workouts array if needed
+        user.workouts = user.workouts.filter(w => !w.equals(workoutId));
+        await user.save(); // Save the updated user
+
+        res.status(200).send('Workout deleted successfully');
+    } catch (error) {
+        console.error(error);
+        res.status(400).send(error.message); // Handle any errors that occur
+    }
+});
+
+
+
+router.post('/logWorkout', async (req, res) => {
+    const { email, exercises, categoryId, workoutId, date } = req.body;
+
+    try {
+        // Find the user by email
+        const user = await getUserByEmail(email);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Find the category by categoryId
         const category = await WorkoutCategory.findById(categoryId);
         if (!category) {
             return res.status(404).send('Category not found');
@@ -34,6 +92,7 @@ router.post('/logWorkout', async (req, res) => {
 
         let workout;
 
+        // Check if we are updating an existing workout
         if (workoutId) {
             workout = await Workout.findById(workoutId);
             if (workout) {
@@ -43,6 +102,7 @@ router.post('/logWorkout', async (req, res) => {
                 return res.status(404).send('Workout not found');
             }
         } else {
+            // Check if the workout already exists for the user, category, and date
             workout = await Workout.findOne({
                 user: user._id,
                 category: categoryId,
@@ -50,7 +110,7 @@ router.post('/logWorkout', async (req, res) => {
                     $gte: new Date(parsedDate).setHours(0, 0, 0, 0),
                     $lte: new Date(parsedDate).setHours(23, 59, 59, 999)
                 },
-                'exercises.name': { $in: exercises.map(e => e.name) }
+                'exercises._id': { $in: exercises.map(e => e._id) }
             });
 
             if (!workout) {
@@ -58,25 +118,27 @@ router.post('/logWorkout', async (req, res) => {
                     exercises,
                     user: user._id,
                     category: category._id,
-                    date: parsedDate // Use the parsed date
+                    date: parsedDate,
                 });
 
+                // Add the workout to the category and user models
                 category.workouts.push(workout._id);
+                await category.save(); // Save the updated category
+
+                user.workouts.push(workout._id);
+                await user.save(); // Save the updated user
             } else {
                 workout.exercises = exercises;
             }
         }
 
         await workout.save();
-        await category.save();
-        user.workouts.push(workout._id);
-        await user.save();
-
         res.status(201).send('Workout logged successfully');
     } catch (error) {
         res.status(400).send(error.message);
     }
 });
+
 
 
 router.get('/user/:email/workouts', async (req, res) => {
@@ -155,6 +217,45 @@ router.get('/category/:categoryId/workouts', async (req, res) => {
         res.status(400).send(error.message);
     }
 });
+
+router.post('/addToCategory', async (req, res) => {
+    const { email, categoryId } = req.body;
+    try {
+        // Find the user by email
+        const user = await getUserByEmail(email);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        
+        // Find the category by ID
+        const category = await WorkoutCategory.findById(categoryId);
+        if (!category) {
+            return res.status(404).send('Category not found');
+        }
+        
+        // Create a new workout with an empty exercises array.
+        // The date will default to Date.now (as per your Workout schema) if not provided.
+        const workout = new Workout({
+            exercises: [],
+            user: user._id,
+            category: category._id
+        });
+        await workout.save();
+        
+        // Add the workout to the category's workouts array
+        category.workouts.push(workout._id);
+        await category.save();
+        
+        // Optionally, add the workout to the user's workouts array if needed.
+        user.workouts.push(workout._id);
+        await user.save();
+        
+        res.status(201).json(workout);
+    } catch (error) {
+        res.status(400).send(error.message);
+    }
+});
+
 
 router.delete('/category/:categoryId', async (req, res) => {
     const { categoryId } = req.params;
