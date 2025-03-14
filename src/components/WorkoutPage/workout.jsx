@@ -82,8 +82,13 @@ const WorkoutLogger = () => {
 
     const handleCategorySelect = (categoryId) => {
         setSelectedCategory(categoryId);
+        setSelectedWorkout(null); // Clear selected workout
+    
+        setExercises([{ name: '', sets: '', reps: '', weight: '', restTime: '', currentRepMax: '', oneRepMax: '' }]);
+    
         fetchWorkoutsByCategory(categoryId);
     };
+    
 
     const onCategoryCreated = () => {
         fetchCategories();
@@ -112,16 +117,22 @@ const WorkoutLogger = () => {
         }
     };
 
-    const handleDeleteWorkout = async (categoryId, workoutId) => {
-        try {
-            await axios.delete(`${baseURL}api/workout/category/${categoryId}/workout/${workoutId}`, {
-                data: { email }
-            });
-            fetchWorkoutsByCategory(selectedCategory);
-        } catch (error) {
-            alert('Error deleting workout: ' + error.message);
-        }
-    };
+const handleDeleteWorkout = async (categoryId, workoutId) => {
+    try {
+        await axios.delete(`${baseURL}api/workout/category/${categoryId}/workout/${workoutId}`, {
+            data: { email }
+        });
+
+        // ✅ Immediately update state to remove the workout
+        setWorkoutsByCategory(prevWorkouts => prevWorkouts.filter(workout => workout._id !== workoutId));
+
+        setError('Workout deleted successfully');
+    } catch (error) {
+        setError('Error deleting workout: ' + error.message);
+    }
+};
+
+    
 
     // Remove an exercise from a workout; if the workout ends up empty, remove it entirely from the UI
     const handleRemoveExercise = async (workoutId, exerciseId) => {
@@ -184,11 +195,9 @@ const WorkoutLogger = () => {
                 exercises,
                 email,
                 date: parsedDate.toISOString(),
-                categoryId: selectedCategory,
+                categoryId: selectedCategory
+                // Note: If you want to support workout updating via workoutId, include it as well.
             };
-            if (selectedWorkout && new Date(selectedWorkout.date).toISOString() === parsedDate.toISOString()) {
-                payload.workoutId = selectedWorkout._id;
-            }
             await axios.post(`${baseURL}api/workout/logWorkout`, payload);
             setIsWorkoutLogged(true);
             setError('');
@@ -198,6 +207,7 @@ const WorkoutLogger = () => {
             setIsWorkoutLogged(false);
         }
     };
+    
 
     // Add a workout to a category (without logging a date)
     const handleAddWorkoutToCategory = async () => {
@@ -314,56 +324,26 @@ const WorkoutLogger = () => {
                 <div>
                     <h3 className="text-lg font-bold mb-3">Workouts in Selected Category</h3>
                     <ul className="space-y-4">
-                        {workoutsByCategory.map((workout) => {
-                            if (workout.exercises && workout.exercises.length > 0) {
-                                return (
-                                    <li key={workout._id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
-                                        <strong>{workout.exercises.map((e) => e.name).join(', ')}</strong>
-                                        <button className="block w-full mt-3 p-2 bg-blue-500 text-white rounded hover:bg-blue-600" onClick={() => handleWorkoutSelect(workout._id)}>
-                                            Edit Workout
-                                        </button>
-                                        
-                                        
-                                        <ul className="space-y-2">
-                                            {workout.exercises.map((exercise, index) => (
-                                                <li key={index}>
-                                                    {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, 
-                                                    Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </li>
-                                );
-                            } else {
-                                return null;
-                            }
-                        })}
+                    {Array.isArray(workoutsByCategory) && workoutsByCategory.map((workout) => (
+    <li key={workout._id} className="bg-white border border-gray-300 rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
+        <strong>{workout.exercises.map((e) => e.name).join(', ')}</strong>
+        <button className="block w-full mt-3 p-2 bg-blue-500 text-white rounded hover:bg-blue-600" onClick={() => handleWorkoutSelect(workout._id)}>
+            Edit Workout
+        </button>
+        <ul className="space-y-2">
+            {workout.exercises.map((exercise, index) => (
+                <li key={index}>
+                    {exercise.name} - Sets: {exercise.sets}, Reps: {exercise.reps}, Weight: {exercise.weight} LBS, Rest Time: {exercise.restTime}s, Current Rep Max: {exercise.currentRepMax} LBS, One Rep Max: {exercise.oneRepMax} LBS
+                </li>
+            ))}
+        </ul>
+    </li>
+))}
+
                     </ul>
                 </div>
             )}
     
-    <div className="mb-5 p-5 bg-gray-50 rounded-lg">
-    <h3 className="text-lg font-bold mb-3">Add Workout to Category</h3>
-    <input
-        type="text"
-        placeholder="Workout Name"
-        value={newWorkoutName}
-        onChange={(e) => setNewWorkoutName(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded mb-2"
-    />
-    <textarea
-        placeholder="Workout Description"
-        value={newWorkoutDescription}
-        onChange={(e) => setNewWorkoutDescription(e.target.value)}
-        className="w-full p-2 border border-gray-300 rounded mb-2"
-    />
-    <button
-        className="w-full p-3 bg-purple-500 text-white rounded hover:bg-purple-600"
-        onClick={handleAddWorkoutToCategory}
-    >
-        Add Workout to Category
-    </button>
-</div>
 
     
             {/* Section for editing/adding exercises before logging a workout */}

@@ -92,43 +92,63 @@ router.post('/logWorkout', async (req, res) => {
 
         let workout;
 
-        // Check if we are updating an existing workout
         if (workoutId) {
+            // Update existing workout if workoutId is provided
             workout = await Workout.findById(workoutId);
             if (workout) {
                 workout.exercises = exercises;
-                workout.date = parsedDate; // Use the parsed date
+                workout.date = parsedDate;
             } else {
                 return res.status(404).send('Workout not found');
             }
         } else {
-            // Check if the workout already exists for the user, category, and date
+            // No workoutId provided, so determine uniqueness by comparing exercise names.
+            // Compute a signature for the incoming exercises:
+            const incomingExerciseNames = exercises.map(e => e.name).sort().join(',');
+
+            // Search for a workout for this user, category, and date (within the same day)
             workout = await Workout.findOne({
                 user: user._id,
                 category: categoryId,
                 date: {
                     $gte: new Date(parsedDate).setHours(0, 0, 0, 0),
                     $lte: new Date(parsedDate).setHours(23, 59, 59, 999)
-                },
-                'exercises._id': { $in: exercises.map(e => e._id) }
+                }
             });
 
-            if (!workout) {
+            if (workout) {
+                // Compare the existing workout's exercise names to the incoming signature
+                const existingExerciseNames = workout.exercises.map(e => e.name).sort().join(',');
+                if (existingExerciseNames === incomingExerciseNames) {
+                    // They match: update the existing workout
+                    workout.exercises = exercises;
+                    workout.date = parsedDate;
+                } else {
+                    // They differ: create a new workout
+                    workout = new Workout({
+                        exercises,
+                        user: user._id,
+                        category: category._id,
+                        date: parsedDate
+                    });
+                    // Add new workout to the category and user
+                    category.workouts.push(workout._id);
+                    await category.save();
+                    user.workouts.push(workout._id);
+                    await user.save();
+                }
+            } else {
+                // No workout exists for that day in this category: create a new one.
                 workout = new Workout({
                     exercises,
                     user: user._id,
                     category: category._id,
-                    date: parsedDate,
+                    date: parsedDate
                 });
-
-                // Add the workout to the category and user models
                 category.workouts.push(workout._id);
-                await category.save(); // Save the updated category
-
+                await category.save();
                 user.workouts.push(workout._id);
-                await user.save(); // Save the updated user
-            } else {
-                workout.exercises = exercises;
+                await user.save();
             }
         }
 
@@ -138,6 +158,8 @@ router.post('/logWorkout', async (req, res) => {
         res.status(400).send(error.message);
     }
 });
+
+
 
 
 
