@@ -23,11 +23,12 @@ app.use("/api/AI", require("./routes/AI"));
 app.use("/api/FitBit", require("./routes/FitBit"));
 
 
-app.use(express.static(path.join(__dirname, '../../build')));
+app.use(express.static(path.join(__dirname, 'build'))); // No ../../ needed
 
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../build', 'index.html')); // Adjusted path
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
+
 
 const port = process.env.PORT || 8080;
 app.listen(port, '0.0.0.0', () => console.log(`Listening on port ${port}...`));
