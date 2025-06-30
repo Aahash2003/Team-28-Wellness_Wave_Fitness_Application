@@ -58,7 +58,7 @@
     "eject": "react-scripts eject",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon src/server/login.js",
-    "heroku-postbuild": "cd client && npm install && npm run build && node ../move-build.js"
+    "heroku-postbuild": "npm run build && node move-build.js"
   },
   "eslintConfig": {
     "extends": [
