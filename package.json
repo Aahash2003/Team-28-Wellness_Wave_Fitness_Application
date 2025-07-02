@@ -20,6 +20,7 @@
     "express": "^4.19.2",
     "framer-motion": "^11.3.24",
     "fs-extra": "^11.2.0",
+    "heroku": "^8.7.1",
     "html-webpack-plugin": "^5.6.0",
     "https-browserify": "^1.0.0",
     "joi": "^17.13.3",
@@ -50,17 +51,17 @@
     "web-vitals": "^2.1.4",
     "webpack": "^5.93.0"
   },
-    "scripts": {
-        "start": "node src/server/login.js",
-        "client": "react-scripts --openssl-legacy-provider start",
-        "build": "cross-env CI=false react-scripts --openssl-legacy-provider build",
-        "build-and-move": "npm run build && node move-build.js",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject",
-        "dev": "concurrently \"npm run server\" \"npm run client\"",
-        "server": "nodemon src/server/login.js",
-        "heroku-postbuild": "npm run build && node move-build.js"
-    },
+  "scripts": {
+    "start": "node src/server/login.js",
+    "client": "react-scripts --openssl-legacy-provider start",
+    "build": "cross-env CI=false react-scripts --openssl-legacy-provider build",
+    "build-and-move": "npm run build && node move-build.js",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "nodemon src/server/login.js",
+    "heroku-postbuild": "npm run build"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
