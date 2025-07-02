@@ -41,6 +41,11 @@ const validate = (data) => {
         nickName: Joi.string().required().label("Nick Name"),
 		email: Joi.string().email().required().label("Email"),
 		password: passwordComplexity().required().label("Password"),
+		confirmPassword: Joi.string()
+			.required()
+			.valid(Joi.ref('password'))
+			.label("Confirm Password")
+			.messages({ 'any.only': 'Passwords do not match' }),
 	});
 	return schema.validate(data);
 };

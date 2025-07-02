@@ -59,7 +59,7 @@ const Signup = () => {
 
         setIsLoading(true);
         try {
-            const url = `${baseURL}api/users`;
+            const url = `${baseURL}api/users/token`;
             const { data: res } = await axios.post(url, data);
             setMsg(res.message);
         } catch (error) {
