@@ -23,10 +23,9 @@ app.use("/api/AI", require("./routes/AI"));
 app.use("/api/FitBit", require("./routes/FitBit"));
 
 
-app.use(express.static(path.join(__dirname, 'build'))); // No ../../ needed
-
+app.use(express.static(path.join(__dirname, '..', '..', 'build')));
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, '..', '..', 'build', 'index.html'));
 });
 
 
